@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
@@ -58,15 +59,27 @@ namespace AutoLazy.Fody
                 LogMethodError("[Lazy] methods must have a non-void return type.", method);
                 valid = false;
             }
+            var bannedPropertyMethods =
+                from prop in method.DeclaringType.Properties
+                where prop.SetMethod != null
+                select prop.GetMethod;
+            if (bannedPropertyMethods.Contains(method))
+            {
+                LogMethodError("[Lazy] properties may not have a setter.", method);
+            }
             return valid;
         }
 
         private IEnumerable<MethodDefinition> GetMethods()
         {
             return from type in ModuleDefinition.Types
-                   from method in type.Methods
-                   let attribute = GetLazyAttribute(method)
-                   where attribute != null
+                   let properties = from prop in type.Properties
+                                    where GetLazyAttribute(prop) != null
+                                    select prop.GetMethod
+                   let methods = from method in type.Methods
+                                 where GetLazyAttribute(method) != null
+                                 select method
+                   from method in properties.Concat(methods).Distinct()
                    select method;
         }
 
