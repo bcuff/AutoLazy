@@ -31,16 +31,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Cecil">
-      <HintPath>..\..\..\Getters\src\Getters.Fody\packages\Fody.1.28.3\Mono.Cecil.dll</HintPath>
+      <HintPath>..\packages\Fody.1.28.3\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>..\..\..\Getters\src\Getters.Fody\packages\Fody.1.28.3\Mono.Cecil.Mdb.dll</HintPath>
+      <HintPath>..\packages\Fody.1.28.3\Mono.Cecil.Mdb.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>..\..\..\Getters\src\Getters.Fody\packages\Fody.1.28.3\Mono.Cecil.Pdb.dll</HintPath>
+      <HintPath>..\packages\Fody.1.28.3\Mono.Cecil.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>..\..\..\Getters\src\Getters.Fody\packages\Fody.1.28.3\Mono.Cecil.Rocks.dll</HintPath>
+      <HintPath>..\packages\Fody.1.28.3\Mono.Cecil.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
