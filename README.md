@@ -2,6 +2,12 @@
 
 Post compile tool using [Fody](https://github.com/Fody/Fody) to implement the double-checked locking pattern.
 
+### The nuget package  [![NuGet Status](http://img.shields.io/nuget/v/AutoLazy.Fody.svg?style=flat)](https://www.nuget.org/packages/AutoLazy.Fody/)
+
+https://nuget.org/packages/AutoLazy.Fody/
+
+    PM> Install-Package AutoLazy.Fody
+
 ### Works on
 * static or instance members
 * parameterless methods
