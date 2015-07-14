@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AutoLazy")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A Fody add-in that implements the double check locking pattern automatically.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Brandon Cuff")]
 [assembly: AssemblyProduct("AutoLazy")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>AutoLazy.Fody</id>
+    <version>1.0.0.0</version>
+    <title>AutoLazy.Fody</title>
+    <authors>Brandon Cuff</authors>
+    <owners>Brandon Cuff</owners>
+    <licenseUrl>https://github.com/bcuff/AutoLazy/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>http://github.com/bcuff/AutoLazy</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A Fody add-in that implements the double check locking pattern automatically.</description>
+    <summary />
+    <language>en-US</language>
+    <copyright>Copyright 2015</copyright>
+    <tags>lazy Fody Cecil ILWeaving</tags>
+    <dependencies>
+      <dependency id="Fody" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\AutoLazy\bin\Release\AutoLazy.dll" target="lib\net40\AutoLazy.dll" />
+    <file src="..\AutoLazy.Fody\bin\Release\AutoLazy.Fody.dll" target="AutoLazy.Fody.dll" />
+    <file src="tools\net40\install.ps1" target="tools\net40\install.ps1" />
+    <file src="tools\net40\uninstall.ps1" target="tools\net40\uninstall.ps1" />
+  </files>
+</package>
