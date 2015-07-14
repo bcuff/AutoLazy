@@ -1,6 +1,6 @@
 # AutoLazy
 
-Post compile tool using [Fody](https://github.com/Fody/Fody) to implement the double check locking pattern.
+Post compile tool using [Fody](https://github.com/Fody/Fody) to implement the double-checked locking pattern.
 
 ### Works on
 * static or instance members
@@ -41,7 +41,7 @@ public class MyClass
 	{
 		get
 		{
-			// thread-safe double check locking pattern generated here
+			// thread-safe double-checked locking pattern generated here
 			var result = _settings;
 			if (result == null)
 			{
