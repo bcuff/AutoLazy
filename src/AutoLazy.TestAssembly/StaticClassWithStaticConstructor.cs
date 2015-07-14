@@ -15,5 +15,14 @@ namespace AutoLazy.TestAssembly
         {
             return "a" + 1;
         }
+
+        public static string Foo
+        {
+            [Lazy]
+            get
+            {
+                return "c" + 3;
+            }
+        }
     }
 }
