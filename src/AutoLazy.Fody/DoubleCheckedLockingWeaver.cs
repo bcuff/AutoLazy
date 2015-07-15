@@ -14,7 +14,7 @@ namespace AutoLazy.Fody
     {
         public static void Instrument(MethodDefinition method)
         {
-            var implMethod = CopyToPriveMethod(method, method.Name + "$Impl");
+            var implMethod = CopyToPrivateMethod(method, method.Name + "$Impl");
             method.Body.Variables.Clear();
             method.Body.Instructions.Clear();
             method.Body.ExceptionHandlers.Clear();
@@ -85,7 +85,7 @@ namespace AutoLazy.Fody
             il.Emit(OpCodes.Ret);
         }
 
-        private static MethodDefinition CopyToPriveMethod(MethodDefinition method, string name)
+        private static MethodDefinition CopyToPrivateMethod(MethodDefinition method, string name)
         {
             var methodAttributes = method.Attributes;
             methodAttributes |= MethodAttributes.Private;
