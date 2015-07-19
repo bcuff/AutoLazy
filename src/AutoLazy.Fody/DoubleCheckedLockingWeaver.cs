@@ -47,12 +47,13 @@ namespace AutoLazy.Fody
         {
             var il = method.Body.GetILProcessor();
             var result = new VariableDefinition(method.ReturnType);
+            method.Body.InitLocals = true;
             method.Body.Variables.Add(result);
             if (!method.IsStatic) il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Volatile);
             il.EmitLoad(valueField);
-            il.Emit(OpCodes.Dup);
-            il.Emit(OpCodes.Stloc_0);
+            il.Emit(OpCodes.Stloc, result);
+            il.Emit(OpCodes.Ldloc, result);
             using (il.BranchIfTrue())
             {
                 il.EmitLock(() =>
@@ -63,8 +64,8 @@ namespace AutoLazy.Fody
                 {
                     if (!method.IsStatic) il.Emit(OpCodes.Ldarg_0);
                     il.EmitLoad(valueField);
-                    il.Emit(OpCodes.Dup);
                     il.Emit(OpCodes.Stloc, result);
+                    il.Emit(OpCodes.Ldloc, result);
                     using (il.BranchIfTrue())
                     {
                         if (!method.IsStatic)
@@ -74,15 +75,16 @@ namespace AutoLazy.Fody
                             il.Emit(OpCodes.Ldarg_0);
                         }
                         il.EmitCall(methodImpl);
-                        il.Emit(OpCodes.Dup);
-                        il.Emit(OpCodes.Stloc_0);
+                        il.Emit(OpCodes.Stloc, result);
+                        il.Emit(OpCodes.Ldloc, result);
                         il.Emit(OpCodes.Volatile);
                         il.EmitStore(valueField);
                     }
                 });
             }
-            il.Emit(OpCodes.Ldloc_0);
+            il.Emit(OpCodes.Ldloc, result);
             il.Emit(OpCodes.Ret);
+            method.Body.OptimizeMacros();
         }
 
         private static MethodDefinition CopyToPrivateMethod(MethodDefinition method, string name)
