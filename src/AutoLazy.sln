@@ -16,6 +16,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{8CAB972D
 		nuget\AutoLazy.nuspec = nuget\AutoLazy.nuspec
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{DC27D55F-2348-4126-9E33-7378144E57DF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "net40", "net40", "{62277F9A-4044-4146-B6F2-D7789D5546B5}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\tools\net40\install.ps1 = nuget\tools\net40\install.ps1
+		nuget\tools\net40\uninstall.ps1 = nuget\tools\net40\uninstall.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,5 +49,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DC27D55F-2348-4126-9E33-7378144E57DF} = {8CAB972D-1105-4DA3-B170-B160B2A300A1}
+		{62277F9A-4044-4146-B6F2-D7789D5546B5} = {DC27D55F-2348-4126-9E33-7378144E57DF}
 	EndGlobalSection
 EndGlobal
