@@ -60,6 +60,11 @@ namespace AutoLazy.Fody
                 LogMethodError("[Lazy] methods must have a non-void return type.", method);
                 valid = false;
             }
+            if (method.ReturnType.IsValueType)
+            {
+                LogMethodError("[Lazy] value types are not currently supported.", method);
+                valid = false;
+            }
             var bannedPropertyMethods =
                 from prop in method.DeclaringType.Properties
                 where prop.SetMethod != null
