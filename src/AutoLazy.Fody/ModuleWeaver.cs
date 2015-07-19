@@ -42,7 +42,8 @@ namespace AutoLazy.Fody
         {
             if (IsValid(method))
             {
-                DoubleCheckedLockingWeaver.Instrument(method);
+                var weaver = new DoubleCheckedLockingWeaver(method);
+                weaver.Instrument();
             }
         }
 

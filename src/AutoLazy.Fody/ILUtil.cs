@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using MethodAttributes = Mono.Cecil.MethodAttributes;
 
 namespace AutoLazy.Fody
 {
@@ -29,6 +30,33 @@ namespace AutoLazy.Fody
                 var parameters = m.GetParameters();
                 return parameters.Length == 1 && parameters[0].IsOut == false && parameters[0].ParameterType == typeof(object);
             });
+        }
+
+        public static MethodDefinition CopyToPrivateMethod(this MethodDefinition method, string name)
+        {
+            var methodAttributes = method.Attributes;
+            methodAttributes |= MethodAttributes.Private;
+            methodAttributes &= ~MethodAttributes.Public;
+            methodAttributes &= ~MethodAttributes.FamANDAssem;
+            methodAttributes &= ~MethodAttributes.Family;
+            var implMethod = new MethodDefinition(name, methodAttributes, method.ReturnType)
+            {
+                Body = { InitLocals = true }
+            };
+            foreach (var instruction in method.Body.Instructions)
+            {
+                implMethod.Body.Instructions.Add(instruction);
+            }
+            foreach (var local in method.Body.Variables)
+            {
+                implMethod.Body.Variables.Add(local);
+            }
+            foreach (var handler in method.Body.ExceptionHandlers)
+            {
+                implMethod.Body.ExceptionHandlers.Add(handler);
+            }
+            method.DeclaringType.Methods.Add(implMethod);
+            return implMethod;
         }
 
         public static IDisposable BranchIfTrue(this ILProcessor il)
