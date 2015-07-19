@@ -11,6 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLazy.TestAssembly", "Au
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLazy.Tests", "AutoLazy.Tests\AutoLazy.Tests.csproj", "{F0B3C1EA-CDD6-4CB3-A3C3-2DC98578EA42}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{8CAB972D-1105-4DA3-B170-B160B2A300A1}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\AutoLazy.nuspec = nuget\AutoLazy.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
