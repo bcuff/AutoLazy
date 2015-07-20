@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace AutoLazy.Tests
 {
     [TestFixture]
-    public class StaticTests
+    public class StaticRefTypeTests
     {
         private static int _getStringCount;
         private static int _stringPropCount;

@@ -8,8 +8,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLazy.Fody", "AutoLazy.Fody\AutoLazy.Fody.csproj", "{AD51E9AE-EA2B-4134-B88B-801116985FB8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLazy.TestAssembly", "AutoLazy.TestAssembly\AutoLazy.TestAssembly.csproj", "{E82A5C93-D946-416D-9CB2-F80BD1AA059B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AD51E9AE-EA2B-4134-B88B-801116985FB8} = {AD51E9AE-EA2B-4134-B88B-801116985FB8}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLazy.Tests", "AutoLazy.Tests\AutoLazy.Tests.csproj", "{F0B3C1EA-CDD6-4CB3-A3C3-2DC98578EA42}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AD51E9AE-EA2B-4134-B88B-801116985FB8} = {AD51E9AE-EA2B-4134-B88B-801116985FB8}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{8CAB972D-1105-4DA3-B170-B160B2A300A1}"
 	ProjectSection(SolutionItems) = preProject
