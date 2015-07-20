@@ -115,7 +115,6 @@ namespace AutoLazy.Fody
             }
             il.Emit(OpCodes.Ldloc, result);
             il.Emit(OpCodes.Ret);
-            _method.Body.OptimizeMacros();
         }
     }
 }
