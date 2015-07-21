@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Xml.Schema;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
@@ -11,6 +12,7 @@ namespace AutoLazy.Fody
     internal class DoubleCheckedLockingWeaver
     {
         readonly MethodDefinition _method;
+        readonly VisitorContext _context;
         readonly TypeReference _objRef;
         readonly MethodReference _objCtorRef;
         TypeDefinition _valueTypeWrapper;
@@ -20,9 +22,10 @@ namespace AutoLazy.Fody
         FieldDefinition _valueField;
         FieldDefinition _syncRootField;
 
-        public DoubleCheckedLockingWeaver(MethodDefinition method)
+        public DoubleCheckedLockingWeaver(MethodDefinition method, VisitorContext context)
         {
             _method = method;
+            _context = context;
             _objRef = method.Module.Import(typeof(object));
             _objCtorRef = method.Module.Import(new MethodReference(".ctor", method.Module.TypeSystem.Void, _objRef)
             {
@@ -30,17 +33,45 @@ namespace AutoLazy.Fody
             });
         }
 
-        public void Instrument()
+        private bool Validate()
         {
-            if (_method.ReturnType.IsValueType)
+            var valid = true;
+            if (_method.Parameters.Count > 0)
             {
-                InitializeValueTypeWrapper();
+                _context.LogError("[Lazy] methods may not have any parameters.", _method);
+                valid = false;
             }
-            CreateFields();
-            InitializeFields();
-            _implMethod = _method.CopyToPrivateMethod(_method.Name + "$Impl");
-            WriteInstructions();
-            _method.Body.OptimizeMacros();
+            if (_method.ReturnType.MetadataType == MetadataType.Void)
+            {
+                _context.LogError("[Lazy] methods must have a non-void return type.", _method);
+                valid = false;
+            }
+            var bannedPropertyMethods =
+                from prop in _method.DeclaringType.Properties
+                where prop.SetMethod != null
+                select prop.GetMethod;
+            if (bannedPropertyMethods.Contains(_method))
+            {
+                _context.LogError("[Lazy] properties may not have a setter.", _method);
+            }
+            return valid;
+        }
+
+        public bool Instrument()
+        {
+            if (Validate())
+            {
+                if (_method.ReturnType.IsValueType)
+                {
+                    InitializeValueTypeWrapper();
+                }
+                CreateFields();
+                InitializeFields();
+                _implMethod = _method.CopyToPrivateMethod(_method.Name + "$Impl");
+                WriteInstructions();
+                return true;
+            }
+            return false;
         }
 
         static int _wrapperCounter;

@@ -53,9 +53,13 @@
   <ItemGroup>
     <Compile Include="DoubleCheckedLockingWeaver.cs" />
     <Compile Include="ILUtil.cs" />
+    <Compile Include="IMethodVisitor.cs" />
+    <Compile Include="IPropertyVisitor.cs" />
+    <Compile Include="LazyVisitor.cs" />
     <Compile Include="ModuleWeaver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeExtensions.cs" />
+    <Compile Include="VisitorContext.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -19,74 +19,49 @@ namespace AutoLazy.Fody
 
         public void Execute()
         {
-            foreach (var method in GetMethods().ToList())
+            var context = new VisitorContext(this);
+            VisitProperties(context);
+            VisitMethods(context);
+        }
+
+        private void VisitProperties(VisitorContext context)
+        {
+            var propertyVisitors = GetImplementations<IPropertyVisitor>();
+            var q = from type in ModuleDefinition.Types
+                    from property in type.Properties
+                    select property;
+            foreach (var property in q.ToList())
             {
-                Instrument(method);
+                foreach (var visitor in propertyVisitors)
+                {
+                    visitor.Visit(property, context);
+                }
             }
         }
 
-        private void LogMethodError(string message, MethodDefinition method)
+        private void VisitMethods(VisitorContext context)
         {
-            var sequencePoint = method.Body.Instructions.Select(i => i.SequencePoint).FirstOrDefault();
-            if (sequencePoint == null)
+            var methodVisitors = GetImplementations<IMethodVisitor>();
+            var q = from type in ModuleDefinition.Types
+                    from method in type.GetMethods()
+                    select method;
+            foreach (var method in q.ToList())
             {
-                LogError(string.Format("{0} - see {1}.{2}", message, method.DeclaringType.FullName, method.Name));
-            }
-            else
-            {
-                LogErrorPoint(message, sequencePoint);
+                foreach (var visitor in methodVisitors)
+                {
+                    visitor.Visit(method, context);
+                }
             }
         }
 
-        private void Instrument(MethodDefinition method)
+        private T[] GetImplementations<T>()
         {
-            if (IsValid(method))
-            {
-                var weaver = new DoubleCheckedLockingWeaver(method);
-                weaver.Instrument();
-            }
-        }
-
-        private bool IsValid(MethodDefinition method)
-        {
-            var valid = true;
-            if (method.Parameters.Count > 0)
-            {
-                LogMethodError("[Lazy] methods may not have any parameters.", method);
-                valid = false;
-            }
-            if (method.ReturnType.MetadataType == MetadataType.Void)
-            {
-                LogMethodError("[Lazy] methods must have a non-void return type.", method);
-                valid = false;
-            }
-            var bannedPropertyMethods =
-                from prop in method.DeclaringType.Properties
-                where prop.SetMethod != null
-                select prop.GetMethod;
-            if (bannedPropertyMethods.Contains(method))
-            {
-                LogMethodError("[Lazy] properties may not have a setter.", method);
-            }
-            return valid;
-        }
-
-        private IEnumerable<MethodDefinition> GetMethods()
-        {
-            return from type in ModuleDefinition.Types
-                   let properties = from prop in type.Properties
-                                    where GetLazyAttribute(prop) != null
-                                    select prop.GetMethod
-                   let methods = from method in type.Methods
-                                 where GetLazyAttribute(method) != null
-                                 select method
-                   from method in properties.Concat(methods).Distinct()
-                   select method;
-        }
-
-        private static CustomAttribute GetLazyAttribute(ICustomAttributeProvider method)
-        {
-            return method.CustomAttributes.FirstOrDefault(attr => attr.AttributeType.FullName == "AutoLazy.LazyAttribute");
+            var visitors = from type in GetType().Assembly.GetTypes()
+                           where !type.IsAbstract
+                           where !type.IsInterface
+                           where typeof(T).IsAssignableFrom(type)
+                           select (T)Activator.CreateInstance(type);
+            return visitors.ToArray();
         }
     }
 }
