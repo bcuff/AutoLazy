@@ -46,6 +46,11 @@ namespace AutoLazy.Fody
                 _context.LogError("[Lazy] methods must have a non-void return type.", _method);
                 valid = false;
             }
+            if (_method.HasGenericParameters)
+            {
+                _context.LogError("[Lazy] is not supported on generic methods.", _method);
+                valid = false;
+            }
             var bannedPropertyMethods =
                 from prop in _method.DeclaringType.Properties
                 where prop.SetMethod != null
