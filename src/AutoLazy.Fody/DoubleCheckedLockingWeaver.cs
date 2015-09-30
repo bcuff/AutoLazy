@@ -67,7 +67,6 @@ namespace AutoLazy.Fody
                 }
                 CreateFields();
                 InitializeFields();
-                _implMethod = _method.CopyToPrivateMethod(_method.Name + "$Impl");
                 WriteInstructions();
                 return true;
             }
@@ -148,9 +147,12 @@ namespace AutoLazy.Fody
 
         private void WriteInstructions()
         {
-            _method.Body.Variables.Clear();
+            var bodyInstructions = _method.Body.Instructions.ToList();
+            foreach (var instruction in bodyInstructions.Where(i => i.OpCode == OpCodes.Ret))
+            {
+                instruction.OpCode = OpCodes.Nop;
+            }
             _method.Body.Instructions.Clear();
-            _method.Body.ExceptionHandlers.Clear();
             var il = _method.Body.GetILProcessor();
             var result = new VariableDefinition(_valueField.FieldType);
             _method.Body.InitLocals = true;
@@ -174,16 +176,9 @@ namespace AutoLazy.Fody
                     il.Emit(OpCodes.Ldloc, result);
                     using (il.BranchIfTrue())
                     {
-                        if (_valueTypeWrapper != null)
+                        foreach (var instruction in bodyInstructions)
                         {
-                            il.Emit(OpCodes.Newobj, _valueTypeWrapperCtor);
-                            il.Emit(OpCodes.Dup);
-                        }
-                        if (!_method.IsStatic) il.Emit(OpCodes.Ldarg_0);
-                        il.EmitCall(_implMethod);
-                        if (_valueTypeWrapper != null)
-                        {
-                            il.Emit(OpCodes.Stfld, _valueTypeWrapperField);
+                            _method.Body.Instructions.Add(instruction);
                         }
                         il.Emit(OpCodes.Stloc, result);
                         if (!_method.IsStatic) il.Emit(OpCodes.Ldarg_0);
