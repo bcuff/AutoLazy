@@ -15,9 +15,9 @@ namespace AutoLazy.Fody
         readonly VisitorContext _context;
         readonly TypeReference _objRef;
         readonly MethodReference _objCtorRef;
-        TypeDefinition _valueTypeWrapper;
-        FieldDefinition _valueTypeWrapperField;
-        MethodDefinition _valueTypeWrapperCtor;
+        TypeReference _valueWrapper;
+        FieldReference _valueWrapperField;
+        MethodReference _valueWrapperCtor;
         MethodDefinition _implMethod;
         FieldDefinition _valueField;
         FieldDefinition _syncRootField;
@@ -66,9 +66,9 @@ namespace AutoLazy.Fody
         {
             if (Validate())
             {
-                if (_method.ReturnType.IsValueType)
+                if (_method.ReturnType.IsValueType || _method.ReturnType.IsGenericParameter)
                 {
-                    InitializeValueTypeWrapper();
+                    InitializeValueWrapper();
                 }
                 CreateFields();
                 InitializeFields();
@@ -80,7 +80,7 @@ namespace AutoLazy.Fody
 
         static int _wrapperCounter;
 
-        private void InitializeValueTypeWrapper()
+        private void InitializeValueWrapper()
         {
             var type = _method.DeclaringType;
             var wrapperType = type.NestedTypes.FirstOrDefault(t =>
@@ -93,31 +93,50 @@ namespace AutoLazy.Fody
                     | TypeAttributes.NestedPrivate
                     | TypeAttributes.Sealed
                     | TypeAttributes.BeforeFieldInit;
-                var field = new FieldDefinition("Value", FieldAttributes.Public | FieldAttributes.Public, _method.ReturnType);
+                wrapperType = new TypeDefinition(string.Empty, "AutoLazy$" + _method.ReturnType.Name + "$Wrapper" + ++_wrapperCounter, typeAttributes, _objRef);
+                type.NestedTypes.Add(wrapperType);
+                FieldDefinition field;
+                if (_method.ReturnType.IsGenericParameter)
+                {
+                    var param = new GenericParameter("TInner", wrapperType);
+                    wrapperType.GenericParameters.Add(param);
+                    field = new FieldDefinition("Value", FieldAttributes.Public, param);
+                    wrapperType.Fields.Add(field);
+                }
+                else
+                {
+                    field = new FieldDefinition("Value", FieldAttributes.Public, _method.ReturnType);
+                    wrapperType.Fields.Add(field);
+                }
                 var ctor = new MethodDefinition(".ctor", MethodAttributes.HideBySig | MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, _method.Module.TypeSystem.Void);
+                wrapperType.Methods.Add(ctor);
                 var il = ctor.Body.GetILProcessor();
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Call, _objCtorRef);
                 il.Emit(OpCodes.Ret);
-                wrapperType = new TypeDefinition(type.Namespace, "AutoLazy$" + _method.ReturnType.Name + "$Wrapper" + ++_wrapperCounter, typeAttributes, _objRef)
-                {
-                    Methods = { ctor },
-                    Fields = { field },
-                };
-                type.NestedTypes.Add(wrapperType);
             }
-            _valueTypeWrapper = wrapperType;
-            _valueTypeWrapperField = wrapperType.Fields[0];
-            _valueTypeWrapperCtor = wrapperType.Methods[0];
+            if (_method.ReturnType.IsGenericParameter)
+            {
+                _valueWrapper = new GenericInstanceType(wrapperType) { GenericArguments = { _method.ReturnType } };
+                _valueWrapperCtor = new MethodReference(".ctor", _method.Module.TypeSystem.Void, _valueWrapper)
+                {
+                    HasThis = true
+                };
+                _valueWrapperField = new FieldReference("Value", _method.ReturnType, _valueWrapper);
+            }
+            else
+            {
+                _valueWrapper = wrapperType;
+                _valueWrapperCtor = wrapperType.Methods[0];
+                _valueWrapperField = wrapperType.Fields[0];
+            }
         }
 
         private void CreateFields()
         {
             var fieldAttributes = FieldAttributes.Private;
             if (_method.IsStatic) fieldAttributes |= FieldAttributes.Static;
-            var fieldType = _method.ReturnType.IsValueType
-                ? _valueTypeWrapper
-                : _method.ReturnType;
+            var fieldType = _valueWrapper ?? _method.ReturnType;
             _valueField = new FieldDefinition(_method.Name + "$Value", fieldAttributes, fieldType);
             _method.DeclaringType.Fields.Add(_valueField);
 
@@ -181,9 +200,18 @@ namespace AutoLazy.Fody
                     il.Emit(OpCodes.Ldloc, result);
                     using (il.BranchIfTrue())
                     {
+                        if (_valueWrapper != null)
+                        {
+                            il.Emit(OpCodes.Newobj, _valueWrapperCtor);
+                            il.Emit(OpCodes.Dup);
+                        }
                         foreach (var instruction in bodyInstructions)
                         {
                             _method.Body.Instructions.Add(instruction);
+                        }
+                        if (_valueWrapper != null)
+                        {
+                            il.Emit(OpCodes.Stfld, _valueWrapperField);
                         }
                         il.Emit(OpCodes.Stloc, result);
                         if (!_method.IsStatic) il.Emit(OpCodes.Ldarg_0);
@@ -194,9 +222,9 @@ namespace AutoLazy.Fody
                 });
             }
             il.Emit(OpCodes.Ldloc, result);
-            if (_valueTypeWrapper != null)
+            if (_valueWrapper != null)
             {
-                il.Emit(OpCodes.Ldfld, _valueTypeWrapperField);
+                il.Emit(OpCodes.Ldfld, _valueWrapperField);
             }
             il.Emit(OpCodes.Ret);
         }

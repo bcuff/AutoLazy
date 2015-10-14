@@ -28,5 +28,11 @@ namespace AutoLazy.TestAssembly
                 return "d" + 4;
             }
         }
+
+        [Lazy]
+        public Guid Car
+        {
+            get { return Guid.NewGuid(); }
+        }
     }
 }
