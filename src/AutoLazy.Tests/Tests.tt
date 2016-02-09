@@ -1,0 +1,122 @@
+﻿<#@ template debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core.dll" #>
+<#@ Assembly Name="System.Xml.dll" #>
+<#@ Assembly Name="System.Xml.Linq.dll" #>
+<#@ Assembly Name="System.Windows.Forms.dll" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #> 
+<#
+    var fixtures = new []
+    {
+        new { Static = false, Type = typeof(Guid), Expression = "Guid.NewGuid()", Try = false },
+        new { Static = true, Type = typeof(Guid), Expression = "Guid.NewGuid()", Try = false },
+        new { Static = false, Type = typeof(string), Expression = "Guid.NewGuid().ToString()", Try = false },
+        new { Static = true, Type = typeof(string), Expression = "Guid.NewGuid().ToString()", Try = false },
+        new { Static = false, Type = typeof(Guid), Expression = "Guid.NewGuid()", Try = true },
+        new { Static = true, Type = typeof(Guid), Expression = "Guid.NewGuid()", Try = true },
+        new { Static = false, Type = typeof(string), Expression = "Guid.NewGuid().ToString()", Try = true },
+        new { Static = true, Type = typeof(string), Expression = "Guid.NewGuid().ToString()", Try = true },
+    };
+#>
+using System;
+using NUnit.Framework;
+
+namespace AutoLazy.Tests
+{
+<# foreach (var fixture in fixtures)
+   {
+       var className = string.Format(
+           "{0}{1}{2}Tests",
+           fixture.Static ? "Static" : "Instance",
+           fixture.Type.Name,
+           fixture.Try ? "WithTry" : "");
+       var type = fixture.Type.Name;
+       var expression = fixture.Expression;
+       var withTry = fixture.Try;
+#>
+    [TestFixture]
+    public class <#=className#>
+    {
+        private static int _getCount;
+        private static int _propCount;
+
+        [Lazy]
+        public static <#=type#> Get<#=type#>()
+        {
+<#  if (withTry)
+    {
+#>
+            try {
+<#
+    }
+#>
+            ++_getCount;
+            return <#=expression#>;
+<#  if (withTry)
+    {
+#>
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+<#  }#>
+        }
+
+        [Lazy]
+        public static <#=type#> <#=type#>Prop
+        {
+            get
+            {
+<#  if (withTry)
+    {
+#>
+            try {
+<#
+    }
+#>
+                ++_propCount;
+                return <#=expression#>;
+<#  if (withTry)
+    {
+#>
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+<#  }#>
+            }
+        }
+
+        [Test]
+        public void Get<#=type#>_should_be_lazy()
+        {
+            Assert.AreEqual(0, _getCount);
+            var first = Get<#=type#>();
+            Assert.AreEqual(1, _getCount);
+            var second = Get<#=type#>();
+            Assert.AreEqual(1, _getCount);
+            Assert.AreEqual(first, second);
+        }
+
+        [Test]
+        public void <#=type#>Prop_should_be_lazy()
+        {
+            Assert.AreEqual(0, _propCount);
+            var first = <#=type#>Prop;
+            Assert.AreEqual(1, _propCount);
+            var second = <#=type#>Prop;
+            Assert.AreEqual(1, _propCount);
+            Assert.AreEqual(first, second);
+        }
+    }
+
+<# } #>
+}

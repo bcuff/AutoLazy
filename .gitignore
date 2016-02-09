@@ -110,5 +110,5 @@ UpgradeLog*.XML
 # Vim temp files
 *~
 
-# Roslyn temp files
-*.ide/
+# Visual Studio temp files
+*sln.ide/
