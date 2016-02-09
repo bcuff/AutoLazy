@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GenericInstanceClass.cs" />
+    <Compile Include="GenericInstanceClassExample.cs" />
     <Compile Include="InstanceClassWithMultipleConstructors.cs" />
     <Compile Include="InstanceClassWithoutConstructor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
