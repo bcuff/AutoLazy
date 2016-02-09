@@ -18,7 +18,6 @@ namespace AutoLazy.Fody
         TypeReference _valueWrapper;
         FieldReference _valueWrapperField;
         MethodReference _valueWrapperCtor;
-        MethodDefinition _implMethod;
         FieldDefinition _valueField;
         FieldDefinition _syncRootField;
 
@@ -179,8 +178,10 @@ namespace AutoLazy.Fody
             _method.Body.Instructions.Clear();
             var il = _method.Body.GetILProcessor();
             var result = new VariableDefinition(_valueField.FieldType);
+            var val = new VariableDefinition(_method.ReturnType);
             _method.Body.InitLocals = true;
             _method.Body.Variables.Add(result);
+            _method.Body.Variables.Add(val);
             if (!_method.IsStatic) il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Volatile);
             il.EmitLoad(_valueField);
@@ -200,17 +201,16 @@ namespace AutoLazy.Fody
                     il.Emit(OpCodes.Ldloc, result);
                     using (il.BranchIfTrue())
                     {
-                        if (_valueWrapper != null)
-                        {
-                            il.Emit(OpCodes.Newobj, _valueWrapperCtor);
-                            il.Emit(OpCodes.Dup);
-                        }
                         foreach (var instruction in bodyInstructions)
                         {
                             _method.Body.Instructions.Add(instruction);
                         }
                         if (_valueWrapper != null)
                         {
+                            il.Emit(OpCodes.Stloc, val);
+                            il.Emit(OpCodes.Newobj, _valueWrapperCtor);
+                            il.Emit(OpCodes.Dup);
+                            il.Emit(OpCodes.Ldloc, val);
                             il.Emit(OpCodes.Stfld, _valueWrapperField);
                         }
                         il.Emit(OpCodes.Stloc, result);
