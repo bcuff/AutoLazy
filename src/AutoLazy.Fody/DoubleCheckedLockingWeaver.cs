@@ -19,6 +19,7 @@ namespace AutoLazy.Fody
         FieldReference _valueWrapperField;
         MethodReference _valueWrapperCtor;
         FieldDefinition _valueField;
+        FieldReference _valueFieldReference;
         FieldDefinition _syncRootField;
 
         public DoubleCheckedLockingWeaver(MethodDefinition method, VisitorContext context)
@@ -116,6 +117,7 @@ namespace AutoLazy.Fody
             }
             if (_method.ReturnType.IsGenericParameter)
             {
+                //_valueWrapper = wrapperType;
                 _valueWrapper = new GenericInstanceType(wrapperType) { GenericArguments = { _method.ReturnType } };
                 _valueWrapperCtor = new MethodReference(".ctor", _method.Module.TypeSystem.Void, _valueWrapper)
                 {
@@ -136,8 +138,13 @@ namespace AutoLazy.Fody
             var fieldAttributes = FieldAttributes.Private;
             if (_method.IsStatic) fieldAttributes |= FieldAttributes.Static;
             var fieldType = _valueWrapper ?? _method.ReturnType;
-            _valueField = new FieldDefinition(_method.Name + "$Value", fieldAttributes, fieldType);
+            _valueFieldReference = _valueField = new FieldDefinition(_method.Name + "$Value", fieldAttributes, fieldType);
             _method.DeclaringType.Fields.Add(_valueField);
+            if (_method.DeclaringType.HasGenericParameters)
+            {
+                var declaringType = _method.DeclaringType.MakeGenericInstanceType(_method.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
+                _valueFieldReference = new FieldReference(_valueField.Name, fieldType, declaringType);
+            }
 
             _syncRootField = new FieldDefinition(_method.Name + "$SyncRoot", fieldAttributes | FieldAttributes.InitOnly, _objRef);
             _method.DeclaringType.Fields.Add(_syncRootField);
@@ -177,14 +184,14 @@ namespace AutoLazy.Fody
             }
             _method.Body.Instructions.Clear();
             var il = _method.Body.GetILProcessor();
-            var result = new VariableDefinition(_valueField.FieldType);
+            var result = new VariableDefinition(_valueFieldReference.FieldType);
             var val = new VariableDefinition(_method.ReturnType);
             _method.Body.InitLocals = true;
             _method.Body.Variables.Add(result);
             _method.Body.Variables.Add(val);
             if (!_method.IsStatic) il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Volatile);
-            il.EmitLoad(_valueField);
+            il.Emit(_method.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, _valueFieldReference);
             il.Emit(OpCodes.Stloc, result);
             il.Emit(OpCodes.Ldloc, result);
             using (il.BranchIfTrue())
@@ -196,7 +203,7 @@ namespace AutoLazy.Fody
                 }, () =>
                 {
                     if (!_method.IsStatic) il.Emit(OpCodes.Ldarg_0);
-                    il.EmitLoad(_valueField);
+                    il.Emit(_method.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, _valueFieldReference);
                     il.Emit(OpCodes.Stloc, result);
                     il.Emit(OpCodes.Ldloc, result);
                     using (il.BranchIfTrue())
@@ -217,7 +224,7 @@ namespace AutoLazy.Fody
                         if (!_method.IsStatic) il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldloc, result);
                         il.Emit(OpCodes.Volatile);
-                        il.EmitStore(_valueField);
+                        il.Emit(_method.IsStatic ? OpCodes.Stsfld : OpCodes.Stfld, _valueFieldReference);
                     }
                 });
             }
