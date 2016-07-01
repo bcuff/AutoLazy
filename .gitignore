@@ -109,6 +109,7 @@ UpgradeLog*.XML
 
 # Vim temp files
 *~
+.*.swp
 
 # Visual Studio temp files
 *sln.ide/
