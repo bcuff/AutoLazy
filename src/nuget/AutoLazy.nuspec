@@ -6,6 +6,7 @@
     <title>AutoLazy.Fody</title>
     <authors>Brandon Cuff</authors>
     <owners>Brandon Cuff</owners>
+    <developmentDependency>true</developmentDependency>
     <licenseUrl>https://github.com/bcuff/AutoLazy/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>http://github.com/bcuff/AutoLazy</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

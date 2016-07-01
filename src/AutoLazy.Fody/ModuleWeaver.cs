@@ -22,6 +22,7 @@ namespace AutoLazy.Fody
             var context = new VisitorContext(this);
             VisitProperties(context);
             VisitMethods(context);
+            VisitAssemblyReferences(context);
         }
 
         private void VisitProperties(VisitorContext context)
@@ -52,6 +53,23 @@ namespace AutoLazy.Fody
                     visitor.Visit(method, context);
                 }
             }
+        }
+
+        private void VisitAssemblyReferences(VisitorContext context)
+        {
+            // Attempt to locate the "AutoLazy" assembly reference.
+            var assemblyName = ModuleDefinition.AssemblyReferences.FirstOrDefault(
+                reference => reference.FullName.StartsWith("AutoLazy")
+            );
+
+            // Verify our result.
+            if(assemblyName == null) {
+                // Will happen if AutoLazy is added, but not used.
+                return;
+            }
+
+            // Remove unnecessary references remaining in our subject assembly.
+            ModuleDefinition.AssemblyReferences.Remove(assemblyName);
         }
 
         private T[] GetImplementations<T>()
