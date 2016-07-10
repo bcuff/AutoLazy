@@ -11,7 +11,7 @@ namespace AutoLazy.Fody
             var lazyAttribute = GetLazyAttribute(method);
             if (lazyAttribute != null)
             {
-                var instrumentor = new DoubleCheckedLockingWeaver(method, context);
+                var instrumentor = GetWeaver(method, context);
                 instrumentor.Instrument();
                 method.CustomAttributes.Remove(lazyAttribute);
             }
@@ -22,7 +22,7 @@ namespace AutoLazy.Fody
             var lazyAttribute = GetLazyAttribute(property);
             if (lazyAttribute != null && property.GetMethod != null && !IsLazy(property.GetMethod))
             {
-                var instrumentor = new DoubleCheckedLockingWeaver(property.GetMethod, context);
+                var instrumentor = GetWeaver(property.GetMethod, context);
                 instrumentor.Instrument();
                 property.CustomAttributes.Remove(lazyAttribute);
             }
@@ -36,6 +36,13 @@ namespace AutoLazy.Fody
         private CustomAttribute GetLazyAttribute(ICustomAttributeProvider target)
         {
             return target.HasCustomAttributes ? target.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "AutoLazy.LazyAttribute") : null;
+        }
+
+        private LazyWeaver GetWeaver(MethodDefinition method, VisitorContext context)
+        {
+            return method.Parameters.Count == 0
+                ? (LazyWeaver)new DoubleCheckedLockingWeaver(method, context)
+                : new KeyedLazyWeaver(method, context);
         }
     }
 }

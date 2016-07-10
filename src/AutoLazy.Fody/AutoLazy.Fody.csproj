@@ -55,7 +55,9 @@
     <Compile Include="ILUtil.cs" />
     <Compile Include="IMethodVisitor.cs" />
     <Compile Include="IPropertyVisitor.cs" />
+    <Compile Include="KeyedLazyWeaver.cs" />
     <Compile Include="LazyVisitor.cs" />
+    <Compile Include="LazyWeaver.cs" />
     <Compile Include="ModuleWeaver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeExtensions.cs" />
