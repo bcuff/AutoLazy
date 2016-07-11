@@ -20,8 +20,7 @@
 			let Expression = item.Expression
 			from Try in new [] { false, true }
 			from GenericType in new [] { false, true }
-			from GenericMethod in new [] { false, true }
-			select new { Static, Type, Expression, Try, GenericType, GenericMethod };
+			select new { Static, Type, Expression, Try, GenericType };
 	var fixtures = q.ToArray();
 #>
 using System;
@@ -32,19 +31,18 @@ namespace AutoLazy.Tests
 <# foreach (var fixture in fixtures)
    {
        var classPrefix = string.Format(
-           "{0}{1}{2}{3}{4}",
+           "{0}{1}{2}{3}",
            fixture.Static ? "Static" : "Instance",
            fixture.Type.Name,
            fixture.Try ? "WithTry" : "",
-           fixture.GenericType ? "GenericType" : "",
-           fixture.GenericMethod ? "GenericMethod" : "");
+           fixture.GenericType ? "GenericType" : "");
        var type = fixture.Type.Name;
        var expression = fixture.Expression;
        var withTry = fixture.Try;
        var keywords = fixture.Static ? "static " : "";
        var genericType = fixture.GenericType;
        var concretePrefix = $"Mock{classPrefix}";
-       if (fixture.GenericType) concretePrefix += $"<{fixture.Type}>";
+       if (genericType) concretePrefix += $"<{fixture.Type}>";
        var accessorPrefix = fixture.Static ? concretePrefix : "instance";
 #>
     public <#=keywords#>class Mock<#=classPrefix#><#=genericType ? "<T>" : ""#>
