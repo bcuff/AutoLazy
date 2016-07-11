@@ -49,6 +49,7 @@ namespace AutoLazy.Tests
     {
         public <#=keywords#>int GetCount;
         public <#=keywords#>int PropCount;
+        public <#=keywords#>int GetKeyedCount;
 
         [Lazy]
         public <#=keywords#><#=type#> Get<#=type#>()
@@ -99,6 +100,28 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public <#=keywords#><#=type#> Get<#=type#>ByKey(<#=type#> key)
+        {
+<#  if (withTry)
+    {
+#>
+            try {
+<#
+    }
+#>
+            ++GetKeyedCount;
+            return key;
+<#  if (withTry)
+    {
+#>
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+<#  }#>
+        }
     }
 
     [TestFixture]
@@ -125,6 +148,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, <#=accessorPrefix#>.PropCount);
             var second = <#=accessorPrefix#>.<#=type#>Prop;
             Assert.AreEqual(1, <#=accessorPrefix#>.PropCount);
+            Assert.AreEqual(first, second);
+        }
+
+        [Test]
+        public void Get<#=type#>ByKey_should_be_lazy()
+        {
+<#  if (!fixture.Static) { #>            var <#=accessorPrefix#> = new <#=concretePrefix#>();<#  } #>
+            Assert.AreEqual(0, <#=accessorPrefix#>.GetKeyedCount);
+            var key1 = <#=expression#>;
+            var key2 = <#=expression#>;
+
+            var first = <#=accessorPrefix#>.Get<#=type#>ByKey(key1);
+            Assert.AreEqual(1, <#=accessorPrefix#>.GetKeyedCount);
+            var second = <#=accessorPrefix#>.Get<#=type#>ByKey(key1);
+            Assert.AreEqual(1, <#=accessorPrefix#>.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = <#=accessorPrefix#>.Get<#=type#>ByKey(key2);
+            Assert.AreEqual(2, <#=accessorPrefix#>.GetKeyedCount);
+            second = <#=accessorPrefix#>.Get<#=type#>ByKey(key2);
+            Assert.AreEqual(2, <#=accessorPrefix#>.GetKeyedCount);
             Assert.AreEqual(first, second);
         }
     }

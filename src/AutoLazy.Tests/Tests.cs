@@ -22,6 +22,7 @@ namespace AutoLazy.Tests
     {
         public static int GetCount;
         public static int PropCount;
+        public static int GetKeyedCount;
 
         [Lazy]
         public static Guid GetGuid()
@@ -44,6 +45,14 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public static Guid GetGuidByKey(Guid key)
+        {
+
+            ++GetKeyedCount;
+            return key;
+
+        }
     }
 
     [TestFixture]
@@ -72,6 +81,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, MockStaticGuid.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetGuidByKey_should_be_lazy()
+        {
+
+            Assert.AreEqual(0, MockStaticGuid.GetKeyedCount);
+            var key1 = Guid.NewGuid();
+            var key2 = Guid.NewGuid();
+
+            var first = MockStaticGuid.GetGuidByKey(key1);
+            Assert.AreEqual(1, MockStaticGuid.GetKeyedCount);
+            var second = MockStaticGuid.GetGuidByKey(key1);
+            Assert.AreEqual(1, MockStaticGuid.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = MockStaticGuid.GetGuidByKey(key2);
+            Assert.AreEqual(2, MockStaticGuid.GetKeyedCount);
+            second = MockStaticGuid.GetGuidByKey(key2);
+            Assert.AreEqual(2, MockStaticGuid.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -79,6 +109,7 @@ namespace AutoLazy.Tests
     {
         public static int GetCount;
         public static int PropCount;
+        public static int GetKeyedCount;
 
         [Lazy]
         public static Guid GetGuid()
@@ -101,6 +132,14 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public static Guid GetGuidByKey(Guid key)
+        {
+
+            ++GetKeyedCount;
+            return key;
+
+        }
     }
 
     [TestFixture]
@@ -129,6 +168,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, MockStaticGuidGenericType<System.Guid>.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetGuidByKey_should_be_lazy()
+        {
+
+            Assert.AreEqual(0, MockStaticGuidGenericType<System.Guid>.GetKeyedCount);
+            var key1 = Guid.NewGuid();
+            var key2 = Guid.NewGuid();
+
+            var first = MockStaticGuidGenericType<System.Guid>.GetGuidByKey(key1);
+            Assert.AreEqual(1, MockStaticGuidGenericType<System.Guid>.GetKeyedCount);
+            var second = MockStaticGuidGenericType<System.Guid>.GetGuidByKey(key1);
+            Assert.AreEqual(1, MockStaticGuidGenericType<System.Guid>.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = MockStaticGuidGenericType<System.Guid>.GetGuidByKey(key2);
+            Assert.AreEqual(2, MockStaticGuidGenericType<System.Guid>.GetKeyedCount);
+            second = MockStaticGuidGenericType<System.Guid>.GetGuidByKey(key2);
+            Assert.AreEqual(2, MockStaticGuidGenericType<System.Guid>.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -136,6 +196,7 @@ namespace AutoLazy.Tests
     {
         public static int GetCount;
         public static int PropCount;
+        public static int GetKeyedCount;
 
         [Lazy]
         public static Guid GetGuid()
@@ -174,6 +235,22 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public static Guid GetGuidByKey(Guid key)
+        {
+
+            try {
+
+            ++GetKeyedCount;
+            return key;
+
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+
+        }
     }
 
     [TestFixture]
@@ -202,6 +279,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, MockStaticGuidWithTry.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetGuidByKey_should_be_lazy()
+        {
+
+            Assert.AreEqual(0, MockStaticGuidWithTry.GetKeyedCount);
+            var key1 = Guid.NewGuid();
+            var key2 = Guid.NewGuid();
+
+            var first = MockStaticGuidWithTry.GetGuidByKey(key1);
+            Assert.AreEqual(1, MockStaticGuidWithTry.GetKeyedCount);
+            var second = MockStaticGuidWithTry.GetGuidByKey(key1);
+            Assert.AreEqual(1, MockStaticGuidWithTry.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = MockStaticGuidWithTry.GetGuidByKey(key2);
+            Assert.AreEqual(2, MockStaticGuidWithTry.GetKeyedCount);
+            second = MockStaticGuidWithTry.GetGuidByKey(key2);
+            Assert.AreEqual(2, MockStaticGuidWithTry.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -209,6 +307,7 @@ namespace AutoLazy.Tests
     {
         public static int GetCount;
         public static int PropCount;
+        public static int GetKeyedCount;
 
         [Lazy]
         public static Guid GetGuid()
@@ -247,6 +346,22 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public static Guid GetGuidByKey(Guid key)
+        {
+
+            try {
+
+            ++GetKeyedCount;
+            return key;
+
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+
+        }
     }
 
     [TestFixture]
@@ -275,6 +390,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, MockStaticGuidWithTryGenericType<System.Guid>.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetGuidByKey_should_be_lazy()
+        {
+
+            Assert.AreEqual(0, MockStaticGuidWithTryGenericType<System.Guid>.GetKeyedCount);
+            var key1 = Guid.NewGuid();
+            var key2 = Guid.NewGuid();
+
+            var first = MockStaticGuidWithTryGenericType<System.Guid>.GetGuidByKey(key1);
+            Assert.AreEqual(1, MockStaticGuidWithTryGenericType<System.Guid>.GetKeyedCount);
+            var second = MockStaticGuidWithTryGenericType<System.Guid>.GetGuidByKey(key1);
+            Assert.AreEqual(1, MockStaticGuidWithTryGenericType<System.Guid>.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = MockStaticGuidWithTryGenericType<System.Guid>.GetGuidByKey(key2);
+            Assert.AreEqual(2, MockStaticGuidWithTryGenericType<System.Guid>.GetKeyedCount);
+            second = MockStaticGuidWithTryGenericType<System.Guid>.GetGuidByKey(key2);
+            Assert.AreEqual(2, MockStaticGuidWithTryGenericType<System.Guid>.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -282,6 +418,7 @@ namespace AutoLazy.Tests
     {
         public static int GetCount;
         public static int PropCount;
+        public static int GetKeyedCount;
 
         [Lazy]
         public static String GetString()
@@ -304,6 +441,14 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public static String GetStringByKey(String key)
+        {
+
+            ++GetKeyedCount;
+            return key;
+
+        }
     }
 
     [TestFixture]
@@ -332,6 +477,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, MockStaticString.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetStringByKey_should_be_lazy()
+        {
+
+            Assert.AreEqual(0, MockStaticString.GetKeyedCount);
+            var key1 = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+
+            var first = MockStaticString.GetStringByKey(key1);
+            Assert.AreEqual(1, MockStaticString.GetKeyedCount);
+            var second = MockStaticString.GetStringByKey(key1);
+            Assert.AreEqual(1, MockStaticString.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = MockStaticString.GetStringByKey(key2);
+            Assert.AreEqual(2, MockStaticString.GetKeyedCount);
+            second = MockStaticString.GetStringByKey(key2);
+            Assert.AreEqual(2, MockStaticString.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -339,6 +505,7 @@ namespace AutoLazy.Tests
     {
         public static int GetCount;
         public static int PropCount;
+        public static int GetKeyedCount;
 
         [Lazy]
         public static String GetString()
@@ -361,6 +528,14 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public static String GetStringByKey(String key)
+        {
+
+            ++GetKeyedCount;
+            return key;
+
+        }
     }
 
     [TestFixture]
@@ -389,6 +564,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, MockStaticStringGenericType<System.String>.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetStringByKey_should_be_lazy()
+        {
+
+            Assert.AreEqual(0, MockStaticStringGenericType<System.String>.GetKeyedCount);
+            var key1 = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+
+            var first = MockStaticStringGenericType<System.String>.GetStringByKey(key1);
+            Assert.AreEqual(1, MockStaticStringGenericType<System.String>.GetKeyedCount);
+            var second = MockStaticStringGenericType<System.String>.GetStringByKey(key1);
+            Assert.AreEqual(1, MockStaticStringGenericType<System.String>.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = MockStaticStringGenericType<System.String>.GetStringByKey(key2);
+            Assert.AreEqual(2, MockStaticStringGenericType<System.String>.GetKeyedCount);
+            second = MockStaticStringGenericType<System.String>.GetStringByKey(key2);
+            Assert.AreEqual(2, MockStaticStringGenericType<System.String>.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -396,6 +592,7 @@ namespace AutoLazy.Tests
     {
         public static int GetCount;
         public static int PropCount;
+        public static int GetKeyedCount;
 
         [Lazy]
         public static String GetString()
@@ -434,6 +631,22 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public static String GetStringByKey(String key)
+        {
+
+            try {
+
+            ++GetKeyedCount;
+            return key;
+
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+
+        }
     }
 
     [TestFixture]
@@ -462,6 +675,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, MockStaticStringWithTry.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetStringByKey_should_be_lazy()
+        {
+
+            Assert.AreEqual(0, MockStaticStringWithTry.GetKeyedCount);
+            var key1 = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+
+            var first = MockStaticStringWithTry.GetStringByKey(key1);
+            Assert.AreEqual(1, MockStaticStringWithTry.GetKeyedCount);
+            var second = MockStaticStringWithTry.GetStringByKey(key1);
+            Assert.AreEqual(1, MockStaticStringWithTry.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = MockStaticStringWithTry.GetStringByKey(key2);
+            Assert.AreEqual(2, MockStaticStringWithTry.GetKeyedCount);
+            second = MockStaticStringWithTry.GetStringByKey(key2);
+            Assert.AreEqual(2, MockStaticStringWithTry.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -469,6 +703,7 @@ namespace AutoLazy.Tests
     {
         public static int GetCount;
         public static int PropCount;
+        public static int GetKeyedCount;
 
         [Lazy]
         public static String GetString()
@@ -507,6 +742,22 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public static String GetStringByKey(String key)
+        {
+
+            try {
+
+            ++GetKeyedCount;
+            return key;
+
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+
+        }
     }
 
     [TestFixture]
@@ -535,6 +786,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, MockStaticStringWithTryGenericType<System.String>.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetStringByKey_should_be_lazy()
+        {
+
+            Assert.AreEqual(0, MockStaticStringWithTryGenericType<System.String>.GetKeyedCount);
+            var key1 = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+
+            var first = MockStaticStringWithTryGenericType<System.String>.GetStringByKey(key1);
+            Assert.AreEqual(1, MockStaticStringWithTryGenericType<System.String>.GetKeyedCount);
+            var second = MockStaticStringWithTryGenericType<System.String>.GetStringByKey(key1);
+            Assert.AreEqual(1, MockStaticStringWithTryGenericType<System.String>.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = MockStaticStringWithTryGenericType<System.String>.GetStringByKey(key2);
+            Assert.AreEqual(2, MockStaticStringWithTryGenericType<System.String>.GetKeyedCount);
+            second = MockStaticStringWithTryGenericType<System.String>.GetStringByKey(key2);
+            Assert.AreEqual(2, MockStaticStringWithTryGenericType<System.String>.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -542,6 +814,7 @@ namespace AutoLazy.Tests
     {
         public int GetCount;
         public int PropCount;
+        public int GetKeyedCount;
 
         [Lazy]
         public Guid GetGuid()
@@ -564,6 +837,14 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public Guid GetGuidByKey(Guid key)
+        {
+
+            ++GetKeyedCount;
+            return key;
+
+        }
     }
 
     [TestFixture]
@@ -592,6 +873,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, instance.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetGuidByKey_should_be_lazy()
+        {
+            var instance = new MockInstanceGuid();
+            Assert.AreEqual(0, instance.GetKeyedCount);
+            var key1 = Guid.NewGuid();
+            var key2 = Guid.NewGuid();
+
+            var first = instance.GetGuidByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            var second = instance.GetGuidByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = instance.GetGuidByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            second = instance.GetGuidByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -599,6 +901,7 @@ namespace AutoLazy.Tests
     {
         public int GetCount;
         public int PropCount;
+        public int GetKeyedCount;
 
         [Lazy]
         public Guid GetGuid()
@@ -621,6 +924,14 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public Guid GetGuidByKey(Guid key)
+        {
+
+            ++GetKeyedCount;
+            return key;
+
+        }
     }
 
     [TestFixture]
@@ -649,6 +960,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, instance.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetGuidByKey_should_be_lazy()
+        {
+            var instance = new MockInstanceGuidGenericType<System.Guid>();
+            Assert.AreEqual(0, instance.GetKeyedCount);
+            var key1 = Guid.NewGuid();
+            var key2 = Guid.NewGuid();
+
+            var first = instance.GetGuidByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            var second = instance.GetGuidByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = instance.GetGuidByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            second = instance.GetGuidByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -656,6 +988,7 @@ namespace AutoLazy.Tests
     {
         public int GetCount;
         public int PropCount;
+        public int GetKeyedCount;
 
         [Lazy]
         public Guid GetGuid()
@@ -694,6 +1027,22 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public Guid GetGuidByKey(Guid key)
+        {
+
+            try {
+
+            ++GetKeyedCount;
+            return key;
+
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+
+        }
     }
 
     [TestFixture]
@@ -722,6 +1071,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, instance.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetGuidByKey_should_be_lazy()
+        {
+            var instance = new MockInstanceGuidWithTry();
+            Assert.AreEqual(0, instance.GetKeyedCount);
+            var key1 = Guid.NewGuid();
+            var key2 = Guid.NewGuid();
+
+            var first = instance.GetGuidByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            var second = instance.GetGuidByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = instance.GetGuidByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            second = instance.GetGuidByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -729,6 +1099,7 @@ namespace AutoLazy.Tests
     {
         public int GetCount;
         public int PropCount;
+        public int GetKeyedCount;
 
         [Lazy]
         public Guid GetGuid()
@@ -767,6 +1138,22 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public Guid GetGuidByKey(Guid key)
+        {
+
+            try {
+
+            ++GetKeyedCount;
+            return key;
+
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+
+        }
     }
 
     [TestFixture]
@@ -795,6 +1182,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, instance.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetGuidByKey_should_be_lazy()
+        {
+            var instance = new MockInstanceGuidWithTryGenericType<System.Guid>();
+            Assert.AreEqual(0, instance.GetKeyedCount);
+            var key1 = Guid.NewGuid();
+            var key2 = Guid.NewGuid();
+
+            var first = instance.GetGuidByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            var second = instance.GetGuidByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = instance.GetGuidByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            second = instance.GetGuidByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -802,6 +1210,7 @@ namespace AutoLazy.Tests
     {
         public int GetCount;
         public int PropCount;
+        public int GetKeyedCount;
 
         [Lazy]
         public String GetString()
@@ -824,6 +1233,14 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public String GetStringByKey(String key)
+        {
+
+            ++GetKeyedCount;
+            return key;
+
+        }
     }
 
     [TestFixture]
@@ -852,6 +1269,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, instance.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetStringByKey_should_be_lazy()
+        {
+            var instance = new MockInstanceString();
+            Assert.AreEqual(0, instance.GetKeyedCount);
+            var key1 = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+
+            var first = instance.GetStringByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            var second = instance.GetStringByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = instance.GetStringByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            second = instance.GetStringByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -859,6 +1297,7 @@ namespace AutoLazy.Tests
     {
         public int GetCount;
         public int PropCount;
+        public int GetKeyedCount;
 
         [Lazy]
         public String GetString()
@@ -881,6 +1320,14 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public String GetStringByKey(String key)
+        {
+
+            ++GetKeyedCount;
+            return key;
+
+        }
     }
 
     [TestFixture]
@@ -909,6 +1356,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, instance.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetStringByKey_should_be_lazy()
+        {
+            var instance = new MockInstanceStringGenericType<System.String>();
+            Assert.AreEqual(0, instance.GetKeyedCount);
+            var key1 = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+
+            var first = instance.GetStringByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            var second = instance.GetStringByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = instance.GetStringByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            second = instance.GetStringByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -916,6 +1384,7 @@ namespace AutoLazy.Tests
     {
         public int GetCount;
         public int PropCount;
+        public int GetKeyedCount;
 
         [Lazy]
         public String GetString()
@@ -954,6 +1423,22 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public String GetStringByKey(String key)
+        {
+
+            try {
+
+            ++GetKeyedCount;
+            return key;
+
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+
+        }
     }
 
     [TestFixture]
@@ -982,6 +1467,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, instance.PropCount);
             Assert.AreEqual(first, second);
         }
+
+        [Test]
+        public void GetStringByKey_should_be_lazy()
+        {
+            var instance = new MockInstanceStringWithTry();
+            Assert.AreEqual(0, instance.GetKeyedCount);
+            var key1 = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+
+            var first = instance.GetStringByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            var second = instance.GetStringByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = instance.GetStringByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            second = instance.GetStringByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+        }
     }
 
 
@@ -989,6 +1495,7 @@ namespace AutoLazy.Tests
     {
         public int GetCount;
         public int PropCount;
+        public int GetKeyedCount;
 
         [Lazy]
         public String GetString()
@@ -1027,6 +1534,22 @@ namespace AutoLazy.Tests
             }
         }
 
+        [Lazy]
+        public String GetStringByKey(String key)
+        {
+
+            try {
+
+            ++GetKeyedCount;
+            return key;
+
+            } catch (Exception e) {
+                throw new Exception("foo", e);
+            } finally {
+                Console.WriteLine("Finally!");
+            }
+
+        }
     }
 
     [TestFixture]
@@ -1053,6 +1576,27 @@ namespace AutoLazy.Tests
             Assert.AreEqual(1, instance.PropCount);
             var second = instance.StringProp;
             Assert.AreEqual(1, instance.PropCount);
+            Assert.AreEqual(first, second);
+        }
+
+        [Test]
+        public void GetStringByKey_should_be_lazy()
+        {
+            var instance = new MockInstanceStringWithTryGenericType<System.String>();
+            Assert.AreEqual(0, instance.GetKeyedCount);
+            var key1 = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+
+            var first = instance.GetStringByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            var second = instance.GetStringByKey(key1);
+            Assert.AreEqual(1, instance.GetKeyedCount);
+            Assert.AreEqual(first, second);
+
+            first = instance.GetStringByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
+            second = instance.GetStringByKey(key2);
+            Assert.AreEqual(2, instance.GetKeyedCount);
             Assert.AreEqual(first, second);
         }
     }
