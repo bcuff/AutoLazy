@@ -12,17 +12,17 @@
 <#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #> 
 <#
-    var fixtures = new []
-    {
-        new { Static = false, Type = typeof(Guid), Expression = "Guid.NewGuid()", Try = false },
-        new { Static = true, Type = typeof(Guid), Expression = "Guid.NewGuid()", Try = false },
-        new { Static = false, Type = typeof(string), Expression = "Guid.NewGuid().ToString()", Try = false },
-        new { Static = true, Type = typeof(string), Expression = "Guid.NewGuid().ToString()", Try = false },
-        new { Static = false, Type = typeof(Guid), Expression = "Guid.NewGuid()", Try = true },
-        new { Static = true, Type = typeof(Guid), Expression = "Guid.NewGuid()", Try = true },
-        new { Static = false, Type = typeof(string), Expression = "Guid.NewGuid().ToString()", Try = true },
-        new { Static = true, Type = typeof(string), Expression = "Guid.NewGuid().ToString()", Try = true },
-    };
+    var initial = new [] { new { } };
+	var q = from v1 in initial
+			from Static in new [] { true, false }
+			from item in new [] { new { Type = typeof(Guid), Expression = "Guid.NewGuid()" }, new { Type = typeof(string), Expression = "Guid.NewGuid().ToString()" } }
+			let Type = item.Type
+			let Expression = item.Expression
+			from Try in new [] { false, true }
+			from GenericType in new [] { false, true }
+			from GenericMethod in new [] { false, true }
+			select new { Static, Type, Expression, Try, GenericType, GenericMethod };
+	var fixtures = q.ToArray();
 #>
 using System;
 using NUnit.Framework;
@@ -31,20 +31,24 @@ namespace AutoLazy.Tests
 {
 <# foreach (var fixture in fixtures)
    {
-       var className = string.Format(
-           "{0}{1}{2}Tests",
+       var classPrefix = string.Format(
+           "{0}{1}{2}{3}{4}",
            fixture.Static ? "Static" : "Instance",
            fixture.Type.Name,
-           fixture.Try ? "WithTry" : "");
+           fixture.Try ? "WithTry" : "",
+           fixture.GenericType ? "GenericType" : "",
+           fixture.GenericMethod ? "GenericMethod" : "");
        var type = fixture.Type.Name;
        var expression = fixture.Expression;
        var withTry = fixture.Try;
+       var genericType = fixture.GenericType;
+       var concretePrefix = classPrefix;
+       if (fixture.GenericType) concretePrefix += $"<{fixture.Type}>";
 #>
-    [TestFixture]
-    public class <#=className#>
+    public class Mock<#=classPrefix#><#=genericType ? "<T>" : ""#>
     {
-        private static int _getCount;
-        private static int _propCount;
+        public static int GetCount;
+        public static int PropCount;
 
         [Lazy]
         public static <#=type#> Get<#=type#>()
@@ -56,7 +60,7 @@ namespace AutoLazy.Tests
 <#
     }
 #>
-            ++_getCount;
+            ++GetCount;
             return <#=expression#>;
 <#  if (withTry)
     {
@@ -81,7 +85,7 @@ namespace AutoLazy.Tests
 <#
     }
 #>
-                ++_propCount;
+                ++PropCount;
                 return <#=expression#>;
 <#  if (withTry)
     {
@@ -95,25 +99,30 @@ namespace AutoLazy.Tests
             }
         }
 
+    }
+
+    [TestFixture]
+    public class <#=classPrefix#>Tests
+    {
         [Test]
         public void Get<#=type#>_should_be_lazy()
         {
-            Assert.AreEqual(0, _getCount);
-            var first = Get<#=type#>();
-            Assert.AreEqual(1, _getCount);
-            var second = Get<#=type#>();
-            Assert.AreEqual(1, _getCount);
+            Assert.AreEqual(0, Mock<#=concretePrefix#>.GetCount);
+            var first = Mock<#=concretePrefix#>.Get<#=type#>();
+            Assert.AreEqual(1, Mock<#=concretePrefix#>.GetCount);
+            var second = Mock<#=concretePrefix#>.Get<#=type#>();
+            Assert.AreEqual(1, Mock<#=concretePrefix#>.GetCount);
             Assert.AreEqual(first, second);
         }
 
         [Test]
         public void <#=type#>Prop_should_be_lazy()
         {
-            Assert.AreEqual(0, _propCount);
-            var first = <#=type#>Prop;
-            Assert.AreEqual(1, _propCount);
-            var second = <#=type#>Prop;
-            Assert.AreEqual(1, _propCount);
+            Assert.AreEqual(0, Mock<#=concretePrefix#>.PropCount);
+            var first = Mock<#=concretePrefix#>.<#=type#>Prop;
+            Assert.AreEqual(1, Mock<#=concretePrefix#>.PropCount);
+            var second = Mock<#=concretePrefix#>.<#=type#>Prop;
+            Assert.AreEqual(1, Mock<#=concretePrefix#>.PropCount);
             Assert.AreEqual(first, second);
         }
     }
