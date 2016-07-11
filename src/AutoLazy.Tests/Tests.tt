@@ -41,17 +41,19 @@ namespace AutoLazy.Tests
        var type = fixture.Type.Name;
        var expression = fixture.Expression;
        var withTry = fixture.Try;
+       var keywords = fixture.Static ? "static " : "";
        var genericType = fixture.GenericType;
-       var concretePrefix = classPrefix;
+       var concretePrefix = $"Mock{classPrefix}";
        if (fixture.GenericType) concretePrefix += $"<{fixture.Type}>";
+       var accessorPrefix = fixture.Static ? concretePrefix : "instance";
 #>
-    public class Mock<#=classPrefix#><#=genericType ? "<T>" : ""#>
+    public <#=keywords#>class Mock<#=classPrefix#><#=genericType ? "<T>" : ""#>
     {
-        public static int GetCount;
-        public static int PropCount;
+        public <#=keywords#>int GetCount;
+        public <#=keywords#>int PropCount;
 
         [Lazy]
-        public static <#=type#> Get<#=type#>()
+        public <#=keywords#><#=type#> Get<#=type#>()
         {
 <#  if (withTry)
     {
@@ -74,7 +76,7 @@ namespace AutoLazy.Tests
         }
 
         [Lazy]
-        public static <#=type#> <#=type#>Prop
+        public <#=keywords#><#=type#> <#=type#>Prop
         {
             get
             {
@@ -107,22 +109,24 @@ namespace AutoLazy.Tests
         [Test]
         public void Get<#=type#>_should_be_lazy()
         {
-            Assert.AreEqual(0, Mock<#=concretePrefix#>.GetCount);
-            var first = Mock<#=concretePrefix#>.Get<#=type#>();
-            Assert.AreEqual(1, Mock<#=concretePrefix#>.GetCount);
-            var second = Mock<#=concretePrefix#>.Get<#=type#>();
-            Assert.AreEqual(1, Mock<#=concretePrefix#>.GetCount);
+<#  if (!fixture.Static) { #>            var <#=accessorPrefix#> = new <#=concretePrefix#>();<#  } #>
+            Assert.AreEqual(0, <#=accessorPrefix#>.GetCount);
+            var first = <#=accessorPrefix#>.Get<#=type#>();
+            Assert.AreEqual(1, <#=accessorPrefix#>.GetCount);
+            var second = <#=accessorPrefix#>.Get<#=type#>();
+            Assert.AreEqual(1, <#=accessorPrefix#>.GetCount);
             Assert.AreEqual(first, second);
         }
 
         [Test]
         public void <#=type#>Prop_should_be_lazy()
         {
-            Assert.AreEqual(0, Mock<#=concretePrefix#>.PropCount);
-            var first = Mock<#=concretePrefix#>.<#=type#>Prop;
-            Assert.AreEqual(1, Mock<#=concretePrefix#>.PropCount);
-            var second = Mock<#=concretePrefix#>.<#=type#>Prop;
-            Assert.AreEqual(1, Mock<#=concretePrefix#>.PropCount);
+<#  if (!fixture.Static) { #>            var <#=accessorPrefix#> = new <#=concretePrefix#>();<#  } #>
+            Assert.AreEqual(0, <#=accessorPrefix#>.PropCount);
+            var first = <#=accessorPrefix#>.<#=type#>Prop;
+            Assert.AreEqual(1, <#=accessorPrefix#>.PropCount);
+            var second = <#=accessorPrefix#>.<#=type#>Prop;
+            Assert.AreEqual(1, <#=accessorPrefix#>.PropCount);
             Assert.AreEqual(first, second);
         }
     }
