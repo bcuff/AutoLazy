@@ -188,6 +188,7 @@ namespace AutoLazy.Fody
                         il.Emit(OpCodes.Stloc, val);
 
                         // copy dictionary and store to dict variable
+                        if (!Method.IsStatic) il.Emit(OpCodes.Ldarg_0);
                         il.Emit(Method.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, _dictionaryFieldRef);
                         il.Emit(OpCodes.Callvirt, _dictionaryCount);
                         il.Emit(OpCodes.Ldc_I4_1);
@@ -200,7 +201,7 @@ namespace AutoLazy.Fody
                         il.Emit(OpCodes.Ldloc, val); // load value
                         il.Emit(OpCodes.Callvirt, _dictionaryAdd);
 
-                        // todo - copy existing vals
+                        if (!Method.IsStatic) il.Emit(OpCodes.Ldarg_0);
                         il.Emit(Method.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, _dictionaryFieldRef);
                         il.Emit(OpCodes.Callvirt, _dictionaryGetEnumerator);
                         il.Emit(OpCodes.Stloc, e);
