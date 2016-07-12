@@ -12,12 +12,14 @@ https://nuget.org/packages/AutoLazy.Fody/
 * static or instance members
 * parameterless methods
 * properties
+* methods with a single parameter *(new)*
 
 ### Example
 Turns this
 ```c#
 public class MyClass
 {
+	// This would work as a method, e.g. GetSettings(), as well.
 	[Lazy]
 	public static Settings Settings
 	{
@@ -28,6 +30,16 @@ public class MyClass
 				var serializer = new XmlSerializer(typeof(Settings));
 				return (Settings)serializer.Deserialize(fs);
 			}
+		}
+	}
+
+	[Lazy]
+	public static Settings GetSettingsFile(string fileName)
+	{
+		using (var fs = File.Open(fileName, FileMode.Open))
+		{
+			var serializer = new XmlSerializer(typeof(Settings));
+			return (Settings)serializer.Deserialize(fs);
 		}
 	}
 }
@@ -53,24 +65,58 @@ public class MyClass
 			{
 				lock(_syncRoot)
 				{
-					if (_settings == null)
+					var result = _settings;
+					if (result == null)
 					{
-						result = _settings = GetSettingsImpl();
+						using (var fs = File.Open("settings.xml", FileMode.Open))
+						{
+							var serializer = new XmlSerializer(typeof(Settings));
+							result = (Settings)serializer.Deserialize(fs);
+						}
 					}
 				}
 			}
 			return result;
 		}
 	}
-	
-	// actual implementation copied here
-	private static Settings GetSettingsImpl()
+
+	// begin - fields added by post-compile step
+	private static readonly object _getSettingsFileSyncRoot = new object();
+	private static volatile Dictionary<string, Settings> _getSettingsFileCache
+		= new Dictionary<string, Settings>();
+	// end
+
+	[Lazy]
+	public static Settings GetSettingsFile(string fileName)
 	{
-		using (var fs = File.Open("settings.xml", FileMode.Open))
+		Settings result;
+		if (!_getSettingsFileCache.TryGetValue(fileName, out result)) // volatile read
 		{
-			var serializer = new XmlSerializer(typeof(Settings));
-			return (Settings)serializer.Deserialize(fs);
+			lock (_getSettingsFileSyncRoot)
+			{
+				if (!_getSettingsFileCache.TryGetValue(fileName, out result))
+				{
+					using (var fs = File.Open(fileName, FileMode.Open))
+					{
+						var serializer = new XmlSerializer(typeof(Settings));
+						result = (Settings)serializer.Deserialize(fs);
+					}
+					// note - we can't mutate the dictionary after
+					// exposing it to reads (possibly from other threads)
+					// therefore, we have to copy the dictionary into a new one
+					// then expose it by setting _getSettingsFileCache
+					var newCache = new Dictionary<string, Settings>(_getSettingsFileCache.Count + 1);
+					newCache.Add(fileName, result);
+					foreach (var pair in _getSettingsFileCache)
+					{
+						newCache.Add(pair.Key, pair.Value);
+					}
+					_getSettingsFileCache = newCache; // volatile write
+				}
+			}
 		}
+		return result;
 	}
+
 }
 ```
