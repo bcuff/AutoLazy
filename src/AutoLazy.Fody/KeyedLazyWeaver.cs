@@ -144,11 +144,8 @@ namespace AutoLazy.Fody
         protected override void WriteInstructions()
         {
             base.WriteInstructions();
+            PrepForRewrite();
             var bodyInstructions = Method.Body.Instructions.ToList();
-            foreach (var instruction in bodyInstructions.Where(i => i.OpCode == OpCodes.Ret))
-            {
-                instruction.OpCode = OpCodes.Nop;
-            }
             Method.Body.Instructions.Clear();
             var il = Method.Body.GetILProcessor();
             var dict = new VariableDefinition(_dictionaryRef);

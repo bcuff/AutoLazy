@@ -20,7 +20,8 @@
 			let Expression = item.Expression
 			from Try in new [] { false, true }
 			from GenericType in new [] { false, true }
-			select new { Static, Type, Expression, Try, GenericType };
+			from MultiReturn in new [] { false, true }
+			select new { Static, Type, Expression, Try, GenericType, MultiReturn };
 	var fixtures = q.ToArray();
 #>
 using System;
@@ -31,11 +32,12 @@ namespace AutoLazy.Tests
 <# foreach (var fixture in fixtures)
    {
        var classPrefix = string.Format(
-           "{0}{1}{2}{3}",
+           "{0}{1}{2}{3}{4}",
            fixture.Static ? "Static" : "Instance",
            fixture.Type.Name,
            fixture.Try ? "WithTry" : "",
-           fixture.GenericType ? "GenericType" : "");
+           fixture.GenericType ? "GenericType" : "",
+           fixture.MultiReturn ? "MultiReturn" : "");
        var type = fixture.Type.Name;
        var expression = fixture.Expression;
        var withTry = fixture.Try;
@@ -50,6 +52,7 @@ namespace AutoLazy.Tests
         public <#=keywords#>int GetCount;
         public <#=keywords#>int PropCount;
         public <#=keywords#>int GetKeyedCount;
+        public <#=keywords#>bool Condition;
 
         [Lazy]
         public <#=keywords#><#=type#> Get<#=type#>()
@@ -61,6 +64,9 @@ namespace AutoLazy.Tests
 <#
     }
 #>
+<#  if (fixture.MultiReturn) { #>
+            if (Condition) return default(<#=type#>);
+<#  } #>
             ++GetCount;
             return <#=expression#>;
 <#  if (withTry)
@@ -86,6 +92,7 @@ namespace AutoLazy.Tests
 <#
     }
 #>
+                if (Condition) return default(<#=type#>);
                 ++PropCount;
                 return <#=expression#>;
 <#  if (withTry)
@@ -110,6 +117,7 @@ namespace AutoLazy.Tests
 <#
     }
 #>
+            if (Condition) return default(<#=type#>);
             ++GetKeyedCount;
             return key;
 <#  if (withTry)

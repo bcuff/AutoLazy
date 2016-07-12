@@ -99,6 +99,37 @@ namespace AutoLazy.Fody
             il.InsertBefore(start, il.Create(Method.IsStatic ? OpCodes.Stsfld : OpCodes.Stfld, SyncRootFieldRef));
         }
 
+        protected void PrepForRewrite()
+        {
+            if (Method.Body.Instructions.Count(i => i.OpCode == OpCodes.Ret) == 1)
+            {
+                var instr = Method.Body.Instructions.Single(i => i.OpCode == OpCodes.Ret);
+                instr.OpCode = OpCodes.Nop;
+                return;
+            }
+
+            var result = new VariableDefinition(Method.ReturnType);
+            Method.Body.Variables.Add(result);
+            var il = Method.Body.GetILProcessor();
+            var last = il.Create(OpCodes.Ldloc, result);
+            il.Append(last);
+
+            var returns = Method.Body.Instructions.Where(i => i.OpCode == OpCodes.Ret).ToList();
+            foreach (var ret in returns)
+            {
+                il.InsertBefore(ret, il.Create(OpCodes.Stloc, result));
+                if (ret.Next == last)
+                {
+                    ret.OpCode = OpCodes.Nop;
+                }
+                else
+                {
+                    ret.OpCode = OpCodes.Br;
+                    ret.Operand = last;
+                }
+            }
+        }
+
         protected virtual void WriteInstructions() { }
 
         public bool Instrument()
