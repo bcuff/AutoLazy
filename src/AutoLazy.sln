@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLazy", "AutoLazy\AutoLazy.csproj", "{9BD5BA05-3433-4BC7-801B-8018454734AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLazy", "AutoLazy\AutoLazy.csproj", "{2E2E3ECA-D74E-451C-BB5D-8AF8FF37AF88}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLazy.Fody", "AutoLazy.Fody\AutoLazy.Fody.csproj", "{AD51E9AE-EA2B-4134-B88B-801116985FB8}"
 EndProject
@@ -36,10 +36,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9BD5BA05-3433-4BC7-801B-8018454734AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9BD5BA05-3433-4BC7-801B-8018454734AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9BD5BA05-3433-4BC7-801B-8018454734AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9BD5BA05-3433-4BC7-801B-8018454734AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E2E3ECA-D74E-451C-BB5D-8AF8FF37AF88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E2E3ECA-D74E-451C-BB5D-8AF8FF37AF88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E2E3ECA-D74E-451C-BB5D-8AF8FF37AF88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E2E3ECA-D74E-451C-BB5D-8AF8FF37AF88}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AD51E9AE-EA2B-4134-B88B-801116985FB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AD51E9AE-EA2B-4134-B88B-801116985FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD51E9AE-EA2B-4134-B88B-801116985FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
