@@ -72,6 +72,7 @@ public class MyClass
 						{
 							var serializer = new XmlSerializer(typeof(Settings));
 							result = (Settings)serializer.Deserialize(fs);
+							_settings = result;
 						}
 					}
 				}
