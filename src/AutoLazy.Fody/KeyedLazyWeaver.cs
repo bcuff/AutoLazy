@@ -53,18 +53,18 @@ namespace AutoLazy.Fody
         {
             base.InitializeTypes();
             var genericArgs = new [] { Method.Parameters[0].ParameterType, Method.ReturnType };
-            var dict = Method.Module.Import(typeof(Dictionary<,>));
+            var dict = Method.Module.ImportReference(typeof(Dictionary<,>));
             _dictionaryRef = dict.MakeGenericInstanceType(genericArgs);
             _dictionaryRef.GenericParameters.Add(new GenericParameter(_dictionaryRef));
             _dictionaryRef.GenericParameters.Add(new GenericParameter(_dictionaryRef));
             var ctor = new MethodReference(".ctor", Method.Module.TypeSystem.Void, _dictionaryRef) { HasThis = true };
-            _dictionaryCtorEmpty = Method.Module.Import(ctor);
+            _dictionaryCtorEmpty = Method.Module.ImportReference(ctor);
             ctor = new MethodReference(".ctor", Method.Module.TypeSystem.Void, _dictionaryRef)
             {
                 HasThis = true,
                 Parameters = { new ParameterDefinition(Method.Module.TypeSystem.Int32) }
             };
-            _dictionaryCtorWithCapacity = Method.Module.Import(ctor);
+            _dictionaryCtorWithCapacity = Method.Module.ImportReference(ctor);
             var add = new MethodReference("Add", Method.Module.TypeSystem.Void, _dictionaryRef)
             {
                 HasThis = true,
@@ -74,7 +74,7 @@ namespace AutoLazy.Fody
                     new ParameterDefinition(_dictionaryRef.GenericParameters[1]),
                 },
             };
-            _dictionaryAdd = Method.Module.Import(add);
+            _dictionaryAdd = Method.Module.ImportReference(add);
             var tryGetValue = new MethodReference("TryGetValue", Method.Module.TypeSystem.Boolean, _dictionaryRef)
             {
                 HasThis = true,
@@ -84,32 +84,32 @@ namespace AutoLazy.Fody
                     new ParameterDefinition(new ByReferenceType(_dictionaryRef.GenericParameters[1])) { IsOut = true },
                 },
             };
-            _dictionaryTryGetValue = Method.Module.Import(tryGetValue);
+            _dictionaryTryGetValue = Method.Module.ImportReference(tryGetValue);
             var count = new MethodReference("get_Count", Method.Module.TypeSystem.Int32, _dictionaryRef) { HasThis = true };
-            _dictionaryCount = Method.Module.Import(count);
-            var enumerator = Method.Module.Import(typeof(Dictionary<,>.Enumerator));
+            _dictionaryCount = Method.Module.ImportReference(count);
+            var enumerator = Method.Module.ImportReference(typeof(Dictionary<,>.Enumerator));
             var parameterizedEnumerator = enumerator.MakeGenericInstanceType(_dictionaryRef.GenericParameters[0], _dictionaryRef.GenericParameters[1]);
-            _dictionaryGetEnumerator = Method.Module.Import(new MethodReference("GetEnumerator", parameterizedEnumerator, _dictionaryRef) { HasThis = true });
+            _dictionaryGetEnumerator = Method.Module.ImportReference(new MethodReference("GetEnumerator", parameterizedEnumerator, _dictionaryRef) { HasThis = true });
 
             // KeyValuePair
-            var kvp = Method.Module.Import(typeof(KeyValuePair<,>));
+            var kvp = Method.Module.ImportReference(typeof(KeyValuePair<,>));
             _keyValuePairRef = kvp.MakeGenericInstanceType(genericArgs);
             _keyValuePairRef.GenericParameters.Add(new GenericParameter(_keyValuePairRef));
             _keyValuePairRef.GenericParameters.Add(new GenericParameter(_keyValuePairRef));
-            _keyValuePairKey = Method.Module.Import(new MethodReference("get_Key", _keyValuePairRef.GenericParameters[0], _keyValuePairRef) { HasThis = true });
-            _keyValuePairValue = Method.Module.Import(new MethodReference("get_Value", _keyValuePairRef.GenericParameters[1], _keyValuePairRef) { HasThis = true });
+            _keyValuePairKey = Method.Module.ImportReference(new MethodReference("get_Key", _keyValuePairRef.GenericParameters[0], _keyValuePairRef) { HasThis = true });
+            _keyValuePairValue = Method.Module.ImportReference(new MethodReference("get_Value", _keyValuePairRef.GenericParameters[1], _keyValuePairRef) { HasThis = true });
 
             // Enumerator
             _dictionaryEnumeratorRef = enumerator.MakeGenericInstanceType(genericArgs);
             _dictionaryEnumeratorRef.GenericParameters.Add(new GenericParameter(_dictionaryEnumeratorRef));
             _dictionaryEnumeratorRef.GenericParameters.Add(new GenericParameter(_dictionaryEnumeratorRef));
             var parameterizedKvp = kvp.MakeGenericInstanceType(_dictionaryEnumeratorRef.GenericParameters[0], _dictionaryEnumeratorRef.GenericParameters[1]);
-            _dictionaryEnumeratorCurrent = Method.Module.Import(new MethodReference("get_Current", parameterizedKvp, _dictionaryEnumeratorRef) { HasThis = true });
-            _dictionaryEnumeratorMoveNext = Method.Module.Import(new MethodReference("MoveNext", Method.Module.TypeSystem.Boolean, _dictionaryEnumeratorRef) { HasThis = true });
+            _dictionaryEnumeratorCurrent = Method.Module.ImportReference(new MethodReference("get_Current", parameterizedKvp, _dictionaryEnumeratorRef) { HasThis = true });
+            _dictionaryEnumeratorMoveNext = Method.Module.ImportReference(new MethodReference("MoveNext", Method.Module.TypeSystem.Boolean, _dictionaryEnumeratorRef) { HasThis = true });
 
             // Dispose
-            _disposableRef = Method.Module.Import(typeof(IDisposable));
-            _disposableDispose = Method.Module.Import(new MethodReference("Dispose", Method.Module.TypeSystem.Void, _disposableRef) { HasThis = true });
+            _disposableRef = Method.Module.ImportReference(typeof(IDisposable));
+            _disposableDispose = Method.Module.ImportReference(new MethodReference("Dispose", Method.Module.TypeSystem.Void, _disposableRef) { HasThis = true });
         }
 
         protected override void CreateFields()

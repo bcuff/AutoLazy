@@ -19,7 +19,7 @@ namespace AutoLazy.Fody
         {
             var cctor = type.GetStaticConstructor();
             if (cctor != null) return cctor;
-            cctor = new MethodDefinition(".cctor", _staticConstructorAttributes, type.Module.Import(typeof(void)));
+            cctor = new MethodDefinition(".cctor", _staticConstructorAttributes, type.Module.ImportReference(typeof(void)));
             type.Methods.Add(cctor);
             var il = cctor.Body.GetILProcessor();
             il.Emit(OpCodes.Ret);
