@@ -16,12 +16,14 @@ namespace AutoLazy.Fody
 
         public void LogError(string message, MethodDefinition method)
         {
-            //var point = method . Body . Instructions . Select ( i => i . SequencePoint ) . FirstOrDefault ( );
-            //if ( point == null )
-            //{
-                message = string . Format ( "{0} - in method {1}.{2}." , message , method . DeclaringType . FullName , method . Name );
-            //}
-            LogError ( message /*, point */);
+            var point = (method.DebugInformation?.HasSequencePoints ?? false)
+                ? method.DebugInformation.SequencePoints.FirstOrDefault()
+                : null;
+            if (point == null)
+            {
+                message = $"{message} - in method {method.DeclaringType.FullName}.{method.Name}.";
+            }
+            LogError(message, point);
         }
 
         public void LogError(string message, SequencePoint point = null)
