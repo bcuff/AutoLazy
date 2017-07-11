@@ -22,8 +22,8 @@ namespace AutoLazy.Fody
         {
             Method = method;
             Context = context;
-            ObjRef = method.Module.Import(typeof(object));
-            ObjCtorRef = method.Module.Import(new MethodReference(".ctor", method.Module.TypeSystem.Void, ObjRef)
+            ObjRef = method.Module. ImportReference ( typeof(object));
+            ObjCtorRef = method.Module. ImportReference ( new MethodReference(".ctor", method.Module.TypeSystem.Void, ObjRef)
             {
                 HasThis = true,
             });

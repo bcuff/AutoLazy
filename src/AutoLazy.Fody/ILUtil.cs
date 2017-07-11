@@ -78,9 +78,9 @@ namespace AutoLazy.Fody
 
         public static void EmitLock(this ILProcessor il, Action loadSyncRoot, Action block)
         {
-            var lockTaken = new VariableDefinition("$lockTaken", il.Body.Method.Module.Import(typeof(bool)));
+            var lockTaken = new VariableDefinition(/*"$lockTaken",*/ il.Body.Method.Module.ImportReference(typeof(bool)));
             il.Body.Variables.Add(lockTaken);
-            var syncRoot = new VariableDefinition("$root", il.Body.Method.Module.Import(typeof(object)));
+            var syncRoot = new VariableDefinition (/*"$root",*/ il .Body.Method.Module.ImportReference(typeof(object)));
             il.Body.Variables.Add(syncRoot);
             il.Emit(OpCodes.Ldc_I4_0);
             il.Emit(OpCodes.Stloc, lockTaken);
@@ -90,7 +90,7 @@ namespace AutoLazy.Fody
                 il.Emit(OpCodes.Dup);
                 il.Emit(OpCodes.Stloc, syncRoot);
                 il.Emit(OpCodes.Ldloca, lockTaken);
-                il.Emit(OpCodes.Call, il.Body.Method.Module.Import(_monitorEnter));
+                il.Emit(OpCodes.Call, il.Body.Method.Module.ImportReference(_monitorEnter));
                 block();
             }, () =>
             {
@@ -98,7 +98,7 @@ namespace AutoLazy.Fody
                 using (il.BranchIfFalse())
                 {
                     il.Emit(OpCodes.Ldloc, syncRoot);
-                    il.Emit(OpCodes.Call, il.Body.Method.Module.Import(_monitorExit));
+                    il.Emit(OpCodes.Call, il.Body.Method.Module.ImportReference(_monitorExit));
                 }
             });
         }
@@ -126,13 +126,13 @@ namespace AutoLazy.Fody
 
         public static void EmitMonitorEnter(this ILProcessor il)
         {
-            var enter = il.Body.Method.Module.Import(_monitorEnter);
+            var enter = il.Body.Method.Module.ImportReference(_monitorEnter);
             il.Emit(OpCodes.Call, enter);
         }
 
         public static Instruction CreateMonitorExit(this ILProcessor il)
         {
-            var exit = il.Body.Method.Module.Import(_monitorExit);
+            var exit = il.Body.Method.Module.ImportReference(_monitorExit);
             return il.Create(OpCodes.Call, exit);
         }
 

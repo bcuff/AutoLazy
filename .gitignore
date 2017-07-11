@@ -113,3 +113,4 @@ UpgradeLog*.XML
 
 # Visual Studio temp files
 *sln.ide/
+/.vs
