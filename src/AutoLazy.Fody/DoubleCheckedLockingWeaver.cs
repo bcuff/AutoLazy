@@ -8,9 +8,9 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
-using MethodAttributes = Mono . Cecil . MethodAttributes ;
-using OpCodes = Mono . Cecil . Cil . OpCodes ;
-using TypeAttributes = Mono . Cecil . TypeAttributes ;
+using MethodAttributes = Mono.Cecil.MethodAttributes;
+using OpCodes = Mono.Cecil.Cil.OpCodes;
+using TypeAttributes = Mono.Cecil.TypeAttributes;
 
 namespace AutoLazy.Fody
 {
