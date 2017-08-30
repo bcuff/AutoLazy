@@ -21,6 +21,7 @@
   </metadata>
   <files>
     <file src="..\AutoLazy\bin\Release\AutoLazy.dll" target="lib\net40\AutoLazy.dll" />
+    <file src="..\AutoLazy\bin\Release\AutoLazy.dll" target="lib\netstandard1.1\AutoLazy.dll" />
     <file src="..\AutoLazy.Fody\bin\Release\AutoLazy.Fody.dll" target="AutoLazy.Fody.dll" />
     <file src="tools\net40\install.ps1" target="tools\net40\install.ps1" />
     <file src="tools\net40\uninstall.ps1" target="tools\net40\uninstall.ps1" />
