@@ -43,7 +43,7 @@ namespace AutoLazy.Fody
         private void VisitMethods(VisitorContext context)
         {
             var methodVisitors = GetImplementations<IMethodVisitor>();
-            var q = from type in ModuleDefinition.Types
+            var q = from type in GetTypes(ModuleDefinition.Types)
                     from method in type.GetMethods()
                     select method;
             foreach (var method in q.ToList())
@@ -54,6 +54,21 @@ namespace AutoLazy.Fody
                 }
             }
         }
+
+        private IEnumerable<TypeDefinition> GetTypes(IEnumerable<TypeDefinition> types)
+        {
+            foreach (var type in types)
+            {
+                yield return type;
+                if (type.NestedTypes != null)
+                {
+                    foreach (var nested in GetTypes(type.NestedTypes))
+                    {
+                        yield return nested;
+                    }
+                }
+            }
+       }
 
         private void VisitAssemblyReferences(VisitorContext context)
         {
