@@ -65,7 +65,7 @@ public class MyClass
 			{
 				lock(_syncRoot)
 				{
-					var result = _settings;
+					result = _settings;
 					if (result == null)
 					{
 						using (var fs = File.Open("settings.xml", FileMode.Open))
