@@ -2,28 +2,23 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>AutoLazy.Fody</id>
-    <version>2.2.1</version>
+    <version>3.0.0</version>
     <title>AutoLazy.Fody</title>
     <authors>Brandon Cuff</authors>
     <owners>Brandon Cuff</owners>
     <developmentDependency>true</developmentDependency>
-    <licenseUrl>https://github.com/bcuff/AutoLazy/blob/master/LICENSE.md</licenseUrl>
-    <projectUrl>http://github.com/bcuff/AutoLazy</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A Fody add-in that implements the double check locking pattern automatically.</description>
     <summary />
     <language>en-US</language>
-    <copyright>Copyright 2015</copyright>
-    <tags>lazy Fody Cecil ILWeaving</tags>
     <dependencies>
-      <dependency id="Fody" version="2.0.0" />
+      <dependency id="Fody" version="3.2.16" />
     </dependencies>
   </metadata>
   <files>
-    <file src="..\AutoLazy\bin\Release\AutoLazy.dll" target="lib\net40\AutoLazy.dll" />
-    <file src="..\AutoLazy\bin\Release\AutoLazy.dll" target="lib\netstandard1.1\AutoLazy.dll" />
+    <file src="..\AutoLazy\bin\Release\AutoLazy.dll" target="lib\net45\AutoLazy.dll" />
     <file src="..\AutoLazy.Fody\bin\Release\AutoLazy.Fody.dll" target="AutoLazy.Fody.dll" />
-    <file src="tools\net40\install.ps1" target="tools\net40\install.ps1" />
-    <file src="tools\net40\uninstall.ps1" target="tools\net40\uninstall.ps1" />
+    <file src="tools\net45\install.ps1" target="tools\net45\install.ps1" />
+    <file src="tools\net45\uninstall.ps1" target="tools\net45\uninstall.ps1" />
   </files>
 </package>

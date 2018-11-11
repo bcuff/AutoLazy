@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace AutoLazy.TestAssembly
+﻿namespace AutoLazy.TestAssembly
 {
     public static class StaticClassWithoutStaticConstructor
     {

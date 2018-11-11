@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Linq;
 
-namespace AutoLazy.Tests
+namespace AutoLazy.Tests.Generic
 {
     public class MockGeneric<T>
     {

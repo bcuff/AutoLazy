@@ -1,9 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System . Reflection ;
-using System . Reflection . Emit ;
-
+﻿using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
@@ -16,6 +11,10 @@ namespace AutoLazy.Fody
 {
     internal class DoubleCheckedLockingWeaver : LazyWeaver
     {
+        TypeReference _objRef;
+        MethodReference _objCtorRef;
+        FieldDefinition _syncRootField;
+        FieldReference _syncRootFieldRef;
         TypeReference _valueWrapper;
         FieldReference _valueWrapperField;
         MethodReference _valueWrapperCtor;
@@ -25,7 +24,6 @@ namespace AutoLazy.Fody
         public DoubleCheckedLockingWeaver(MethodDefinition method, VisitorContext context)
             : base(method, context)
         {
-
         }
 
         protected override bool Validate()
@@ -42,6 +40,13 @@ namespace AutoLazy.Fody
         protected override void InitializeTypes()
         {
             base.InitializeTypes();
+
+            _objRef = Method.Module. ImportReference ( typeof(object));
+            _objCtorRef = Method.Module. ImportReference ( new MethodReference(".ctor", Method.Module.TypeSystem.Void, _objRef)
+            {
+                HasThis = true,
+            });
+
             if (Method.ReturnType.IsValueType || Method.ReturnType.IsGenericParameter)
             {
                 InitializeValueWrapper();
@@ -63,7 +68,7 @@ namespace AutoLazy.Fody
                     | TypeAttributes.NestedPrivate
                     | TypeAttributes.Sealed
                     | TypeAttributes.BeforeFieldInit;
-                wrapperType = new TypeDefinition(string.Empty, "AutoLazy$" + Method.ReturnType.Name + "$Wrapper" + ++_wrapperCounter, typeAttributes, ObjRef);
+                wrapperType = new TypeDefinition(string.Empty, "AutoLazy$" + Method.ReturnType.Name + "$Wrapper" + ++_wrapperCounter, typeAttributes, _objRef);
                 type.NestedTypes.Add(wrapperType);
                 FieldDefinition field;
                 if (Method.ReturnType.IsGenericParameter)
@@ -82,7 +87,7 @@ namespace AutoLazy.Fody
                 wrapperType.Methods.Add(ctor);
                 var il = ctor.Body.GetILProcessor();
                 il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Call, ObjCtorRef);
+                il.Emit(OpCodes.Call, _objCtorRef);
                 il.Emit(OpCodes.Ret);
             }
             if (Method.ReturnType.IsGenericParameter)
@@ -108,6 +113,20 @@ namespace AutoLazy.Fody
             base.CreateFields();
             var fieldAttributes = FieldAttributes.Private;
             if (Method.IsStatic) fieldAttributes |= FieldAttributes.Static;
+
+            _syncRootField = new FieldDefinition(Method.Name + "$SyncRoot", fieldAttributes | FieldAttributes.InitOnly, _objRef);
+            Method.DeclaringType.Fields.Add(_syncRootField);
+            if (Method.DeclaringType.HasGenericParameters)
+            {
+                var declaringType = Method.DeclaringType.MakeGenericInstanceType(
+                    Method.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
+                _syncRootFieldRef = new FieldReference(_syncRootField.Name, _objRef, declaringType);
+            }
+            else
+            {
+                _syncRootFieldRef = _syncRootField;
+            }
+            
             var fieldType = _valueWrapper ?? Method.ReturnType;
             _valueFieldReference = _valueField = new FieldDefinition(Method.Name + "$Value", fieldAttributes, fieldType);
             Method.DeclaringType.Fields.Add(_valueField);
@@ -116,6 +135,16 @@ namespace AutoLazy.Fody
                 var declaringType = Method.DeclaringType.MakeGenericInstanceType(Method.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
                 _valueFieldReference = new FieldReference(_valueField.Name, fieldType, declaringType);
             }
+        }
+
+        protected override void InitializeFields(MethodDefinition ctor)
+        {
+            var il = ctor.Body.GetILProcessor();
+            var start = ctor.Body.Instructions.First();
+            if (!Method.IsStatic) il.InsertBefore(start, il.Create(OpCodes.Ldarg_0));
+            il.InsertBefore(start, il.Create(OpCodes.Newobj, _objCtorRef));
+            il.InsertBefore(start, il.Create(Method.IsStatic ? OpCodes.Stsfld : OpCodes.Stfld, _syncRootFieldRef));
+            base.InitializeFields(ctor);
         }
 
         protected override void WriteInstructions()
@@ -140,7 +169,7 @@ namespace AutoLazy.Fody
                 il.EmitLock(() =>
                 {
                     if (!Method.IsStatic) il.Emit(OpCodes.Ldarg_0);
-                    il.Emit(Method.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, SyncRootFieldRef);
+                    il.Emit(Method.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, _syncRootFieldRef);
                 }, () =>
                 {
                     if (!Method.IsStatic) il.Emit(OpCodes.Ldarg_0);

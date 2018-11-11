@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
+using Fody;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 
 namespace AutoLazy.Fody
 {
-    public class ModuleWeaver
+    public class ModuleWeaver : BaseModuleWeaver
     {
-        public ModuleDefinition ModuleDefinition { get; set; }
-
-        public Action<string> LogError { get; set; }
-
-        public Action<string, SequencePoint> LogErrorPoint { get; set; }
-
-        public void Execute()
+        public override void Execute()
         {
             var context = new VisitorContext(this);
             VisitProperties(context);
             VisitMethods(context);
             VisitAssemblyReferences(context);
+        }
+
+        public override IEnumerable<string> GetAssembliesForScanning()
+        {
+            yield return "mscorlib";
+            yield return "System";
+            yield return "System.Runtime";
+            yield return "System.Reflection";
+            yield return "System.Diagnostics";
+            yield return "netstandard";
         }
 
         private void VisitProperties(VisitorContext context)

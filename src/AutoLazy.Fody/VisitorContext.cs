@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -12,6 +11,11 @@ namespace AutoLazy.Fody
         public VisitorContext(ModuleWeaver weaver)
         {
             _weaver = weaver;
+        }
+
+        public void LogInfo(string message)
+        {
+            _weaver.LogInfo(message);
         }
 
         public void LogError(string message, MethodDefinition method)

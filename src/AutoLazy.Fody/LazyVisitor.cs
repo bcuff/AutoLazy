@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Mono.Cecil;
 
 namespace AutoLazy.Fody
@@ -41,7 +40,7 @@ namespace AutoLazy.Fody
         private LazyWeaver GetWeaver(MethodDefinition method, VisitorContext context)
         {
             return method.Parameters.Count == 0
-                ? (LazyWeaver)new DoubleCheckedLockingWeaver(method, context)
+                ? (LazyWeaver) new DoubleCheckedLockingWeaver(method, context)
                 : new KeyedLazyWeaver(method, context);
         }
     }
