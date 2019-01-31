@@ -14,6 +14,10 @@ https://nuget.org/packages/AutoLazy.Fody/
 * properties
 * methods with a single parameter *(new)*
 
+### Contributing
+
+Please read the [guidelines](./CONTRIBUTING.md) before submitting any changes. Thanks you!
+
 ### Example
 Turns this
 ```c#
