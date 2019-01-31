@@ -16,7 +16,7 @@ https://nuget.org/packages/AutoLazy.Fody/
 
 ### Contributing
 
-Please read the [guidelines](./CONTRIBUTING.md) before submitting any changes. Thanks you!
+Please read the [guidelines](./CONTRIBUTING.md) before submitting any changes. Thank you!
 
 ### Example
 Turns this
