@@ -7,22 +7,23 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 
+using global::Fody;
+
 namespace AutoLazy.Fody
 {
-    public class ModuleWeaver
+    public class ModuleWeaver : BaseModuleWeaver
     {
-        public ModuleDefinition ModuleDefinition { get; set; }
-
-        public Action<string> LogError { get; set; }
-
-        public Action<string, SequencePoint> LogErrorPoint { get; set; }
-
-        public void Execute()
+        public override void Execute()
         {
             var context = new VisitorContext(this);
             VisitProperties(context);
             VisitMethods(context);
             VisitAssemblyReferences(context);
+        }
+
+        public override IEnumerable<string> GetAssembliesForScanning()
+        {
+            yield break;
         }
 
         private void VisitProperties(VisitorContext context)
